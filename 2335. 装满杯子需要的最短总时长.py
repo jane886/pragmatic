@@ -40,6 +40,8 @@ amount.length == 3
 """
 from typing import List
 
+from utils import ensure
+
 
 class Solution:
     def fillCups(self, amount: List[int]) -> int:
@@ -75,11 +77,6 @@ class Test:
         amount = [5, 0, 0]
         s = Solution()
         ensure(s.fillCups(amount), 5, "测试 3")
-
-
-def ensure(con1, con2, message):
-    if con1 != con2:
-        print(message)
 
 
 def main():
