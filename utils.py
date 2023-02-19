@@ -1,5 +1,7 @@
 def ensure(con1, con2, message):
     if isinstance(con2, list):
+        con1.sort()
+        con2.sort()
         if len(con1) == len(con2):
             for i, e in enumerate(con2):
                 if e != con1[i]:
