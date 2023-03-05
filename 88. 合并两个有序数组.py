@@ -50,17 +50,25 @@ class Solution:
         """
         Do not return anything, modify nums1 in-place instead.
         """
-        i, j, k = m - 1, n - 1, m + n - 1
-        while i >= 0 and j >= 0:
-            if nums1[i] > nums2[j]:
-                nums1[k] = nums1[i]
-                i -= 1
+        # 从后往前遍历，设置三个指针，分别指向 nums1, nums2, nums1 的尾部
+        # 比较 nums1 和 nums2 的最后一个元素，将较大的元素放到 nums1 的尾部
+        # 重复上述操作，直到 nums1 或 nums2 遍历完毕
+        p1, p2 = m - 1, n - 1
+        tail = m + n - 1
+        while p1 >= 0 or p2 >= 0:
+            if p1 == -1:
+                nums1[tail] = nums2[p2]
+                p2 -= 1
+            elif p2 == -1:
+                nums1[tail] = nums1[p1]
+                p1 -= 1
+            elif nums1[p1] > nums2[p2]:
+                nums1[tail] = nums1[p1]
+                p1 -= 1
             else:
-                nums1[k] = nums2[j]
-                j -= 1
-            k -= 1
-        if j >= 0:
-            nums1[:j + 1] = nums2[:j + 1]
+                nums1[tail] = nums2[p2]
+                p2 -= 1
+            tail -= 1
 
 
 class Test:
