@@ -46,6 +46,8 @@ class Solution:
     def numDecodings(self, s: str) -> int:
         # f[i] 表示 s 的前 i 个字符 s[0..i-1] 的解码方法数
         # f[i] = f[i-1] + f[i-2]
+        # f[i-1] 表示 s[i-1] 单独解码
+        # f[i-2] 表示 s[i-2..i-1] 解码
 
         n = len(s)
         f = [1] + [0] * n
