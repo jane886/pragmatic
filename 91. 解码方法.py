@@ -44,19 +44,17 @@ from utils import ensure
 
 class Solution:
     def numDecodings(self, s: str) -> int:
+        # f[i] 表示 s 的前 i 个字符 s[0..i-1] 的解码方法数
+        # f[i] = f[i-1] + f[i-2]
+
         n = len(s)
-        a, b, c = 0, 1, 0
-
+        f = [1] + [0] * n
         for i in range(1, n + 1):
-            c = 0
             if s[i - 1] != '0':
-                c += b
-
-            if i > 1 and s[i - 2] != '0' and int(s[i-2:i]) <= 26:
-                c += a
-
-            a, b = b, c
-        return c
+                f[i] += f[i - 1]
+            if i > 1 and s[i - 2] != '0' and int(s[i - 2:i]) <= 26:
+                f[i] += f[i - 2]
+        return f[n]
 
 
 class Test:
@@ -86,8 +84,8 @@ class Test:
 def main():
     t = Test()
     t.test1()
-    t.test2()
-    t.test3()
+    # t.test2()
+    # t.test3()
 
 
 if __name__ == '__main__':
