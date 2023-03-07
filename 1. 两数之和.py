@@ -41,15 +41,18 @@ from utils import ensure
 
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
-        # 遍历数组，算出 target - 当前元素的差值，是否在字典出现，如果未出现，则用字典保存，key=当前元素，value=当前坐标
-        # 如果出现，返回字典里该差值的 value 和当前坐标
+        # 1. 遍历数组
+        # 2. 算出 target - 当前元素的差值
+        # 3. 判断差值是否在字典出现
+        # 4. 如果未出现，则用字典保存，key=当前元素，value=当前坐标
+        # 5. 如果出现，返回字典里该差值的 value 和当前坐标
         d = {}
-        for i, e in enumerate(nums):
-            n = target - e
-            if n in d:
-                return [d[n], i]
+        for i, current in enumerate(nums):
+            diff = target - current
+            if diff in d:
+                return [d[diff], i]
             else:
-                d[e] = i
+                d[current] = i
 
 
 class Test:

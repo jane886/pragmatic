@@ -31,31 +31,30 @@ from utils import ensure
 
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
-        # 开始遍历，用 element 记录已经遍历过的元素，
-        # 当前元素如果未出现在记录中，添加
-        # 如果出现过，记录当前 element 的长度，组合当前元素，找到当前元素最早出现的下标，element 截取为下标 + 1 后面的元素
-        # 最后要再检查下 element 的长度
-        length = 0
-        offset = 0
-        element = ''
-        while offset < len(s):
-            # print(f"element:{element}", f"目前最长距离:{length}")
-            e = s[offset]
-            # print(f"当前元素:{e}", f"组合元素:{element + e}")
-            # print(f"出现重复:{e in element}")
-            if e not in element:
-                element += e
+        # 1. 定义左右指针
+        # 2. 定义最大长度
+        # 3. 定义最大字符串
+        # 4. 定义字符集合
+        # 5. 遍历字符串
+        # 6. 如果当前字符不在字符集合中，则将当前字符加入字符集合，右指针右移
+        # 7. 如果当前字符在字符集合中，则将左指针右移，直到当前字符不在字符集合中
+        # 8. 如果当前字符不在字符集合中，则将当前字符加入字符集合，右指针右移
+        # 9. 如果当前字符在字符集合中，则将左指针右移，直到当前字符不在字符集合中
+        # 10. 重复 6-9
+        # 11. 返回最大长度
+        left = right = 0
+        max_len = 0
+        char_set = set()
+        while right < len(s):
+            if s[right] not in char_set:
+                char_set.add(s[right])
+                right += 1
+                if right - left > max_len:
+                    max_len = right - left
             else:
-                length = len(element) if len(element) > length else length
-                element += e
-                index = element.index(e)
-                # print(f"元素在第{index}坐标")
-                element = element[index + 1:]
-            offset += 1
-            # print(f"--------------")
-
-        length = len(element) if len(element) > length else length
-        return length
+                char_set.remove(s[left])
+                left += 1
+        return max_len
 
 
 class Test:

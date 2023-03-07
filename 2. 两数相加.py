@@ -39,13 +39,15 @@ class ListNode:
 
 class Solution:
     def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
-        # 初始化 pre 为第一个节点，同时 head 指向第一个节点
+        # 1. 遍历两个链表，同时计算和
+        # 2. 如果和大于 10，则进位
+        # 3. 如果和小于 10，则不进位
+        # 4. 如果有一个链表遍历完了，另一个链表还有剩余，则继续遍历剩余的链表
+        # 5. 如果两个链表都遍历完了，但是有进位，则在结果链表后面加一个节点
         pre = ListNode(0)
         current = pre
         carry = 0
-        # 分别遍历两个链表
         while l1 is not None or l2 is not None:
-            # 开始相加 l1 和 l2 的值，用 sum 接住
             sum = 0
             if l1 is not None:
                 sum += l1.val
@@ -54,25 +56,17 @@ class Solution:
             if l2 is not None:
                 sum += l2.val
                 l2 = l2.next
-            # 当 sum 值大于 10，carry 进 1 位，sum - 10
             sum += carry
             carry = sum // 10
             sum = sum % 10
 
-            # 把 current 的下一位指向当前 sum 值的节点，然后把 current 指向 下一位
             current.next = ListNode(sum)
             current = current.next
 
-        # 这里最后再加上 carry 的进位，假设最后两个数加起来超过 10 了
         if carry > 0:
             current.next = ListNode(carry)
 
         return pre.next
-
-
-
-
-
 
 
 def node_list(l):
