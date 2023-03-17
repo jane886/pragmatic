@@ -35,13 +35,42 @@ from utils import ensure
 
 class Solution:
     def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
-        nums = nums1 + nums2
-        nums.sort()
-        if len(nums) % 2 == 0:
-            mid = len(nums) // 2
-            return (nums[mid - 1] + nums[mid]) / 2
-        else:
-            return nums[len(nums) // 2]
+        # 确定较短数组为 nums1
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
+
+        m, n = len(nums1), len(nums2)  # 两个数组的长度
+        left, right = 0, m  # 二分上下界，初始为整个 nums1 的范围
+
+        while left <= right:
+            i = (left + right) // 2  # nums1 分界线位置
+            j = (m + n + 1) // 2 - i  # nums2 分界线位置
+
+            # 找到 nums1 的右半部分的最小值和 nums2 的左半部分的最大值
+            nums1_right_min = float('inf') if i == m else nums1[i]
+            nums2_left_max = float('-inf') if j == 0 else nums2[j - 1]
+
+            # 找到 nums1 的左半部分的最大值和 nums2 的右半部分的最小值
+            nums1_left_max = float('-inf') if i == 0 else nums1[i - 1]
+            nums2_right_min = float('inf') if j == n else nums2[j]
+
+            # 满足条件：左半部分的所有数都小于右半部分的所有数
+            if nums1_left_max <= nums2_right_min and nums2_left_max <= nums1_right_min:
+                # 判断总元素个数的奇偶性，确定中位数
+                if (m + n) % 2 == 0:
+                    return (max(nums1_left_max, nums2_left_max) + min(nums1_right_min, nums2_right_min)) / 2.0
+                else:
+                    return max(nums1_left_max, nums2_left_max)
+
+            # 如果 nums1 的右半部分的最小值大于 nums2 的左半部分的最大值
+            # 分界线需要左移
+            elif nums1_right_min > nums2_left_max:
+                right = i - 1
+
+            # 如果 nums2 的右半部分的最小值大于 nums1 的左半部分的最大值
+            # 分界线需要右移
+            else:
+                left = i + 1
 
 
 class Test:
