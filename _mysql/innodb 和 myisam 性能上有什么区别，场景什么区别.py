@@ -3,70 +3,22 @@
 
 InnoDB 和 MyISAM 性能上有什么区别，场景什么区别
 
-    InnoDB 和 MyISAM 在性能方面的区别如下：
-    1，读写性能：在读写方面，MyISAM 的性能优于 InnoDB，因为 MyISAM 采用表级锁定，对于大量的读操作，可以提高并发性能。
-     而 InnoDB 采用行级锁定，对于大量的写操作，可以提高并发性能。
-     因此，在读多写少的应用中，MyISAM 更适合；
-     在读写操作比较均衡的应用中，InnoDB 更适合
+    InnoDB 和 MyISAM 是 MySQL 数据库中两种常见的存储引擎，它们的性能特点和使用场景也有所不同，它们主要的区别如下：
 
-    2，并发性能：在并发方面，InnoDB 的性能优于 MyISAM，因为 InnoDB 采用行级锁定和缓冲池机制，可以提高并发性。
-     而 MyISAM 采用表级锁定和操作系统级别的缓存机制，容易造成锁定等待和死锁。因此，在并发读写较高的应用中，InnoDB 更适合
+    1，事务支持：InnoDB 支持事务处理，可以确保数据的完整性和一致性，而 MyISAM 不支持事务处理。因此，在需要保证数据一致性的应用场景下，
+     使用 InnoDB 更为合适
 
-    3，整体性能：在整体性能方面，InnoDB 的性能优于 MyISAM，因为 InnoDB 支持事务处理，外间关联等高级功能，可以保证数据的完整性和一致性。
-     同时，InnoDB 支持 B+ 树索引结构和缓冲池机制，可以提高查询性能和排序性能。而 MyISAM 不支持这些高级功能，所以在可靠性和性能方面都不如 InnoDB
+    2，锁定机制：InnoDB 使用行级锁定，而 MyISAM 采用表级锁定。这意味着在高并发情况下，InnoDB 具有更好的性能，因为它允许多个用户
+     同时访问同一表的不同行，而 MyISAM 则会因为锁定机制的限制而出现性能瓶颈，不适合高并发的应用场景
 
-    在选择存储引擎时，需要根据应用程序的特点和需求来进行选择。如果应用程序需要高并发和高读写性能，可以选择 MyISAM；
-    如果应用程序
+    3，外键支持：InnoDB 支持外键约束，而 MyISAM 不支持。如果需要再数据表之间建立关联关系，使用 InnoDB 更为合适
 
+    4，缓存机制：InnoDB 使用缓存池来缓存数据和索引，而 MyISAM 只缓存索引。这意味着在进行大量读取操作时，MyISAM 可以使用更少的内存来
+     缓存更多的数据，从而提高读取性能。但是，如果需要频繁的更新、插入或删除数据，InnoDB 的性能可能会更佳
+
+    5，全文索引：MyISAM 支持全文索引，而 InnoDB 不支持。如果需要进行全文搜索，使用 MyISAM 更为合适
+
+    综上所述，如果需要对数据进行频繁更新、插入或删除操作时，或者需要支持事务处理和外键约束，那么使用 InnoDB 是更好的选择。如果数据需要进行
+    大量的读操作，而且对数据一致性要求不高，那么使用 MyISAM 也是可行的选择
 
 """
-
-import time
-
-
-def record_time(func):
-    def log(*args, **kwargs):
-        start = int(time.time() * 1000)
-        res = func(*args, **kwargs)
-        end = int(time.time() * 1000)
-        print(f"记录时长:{end - start} ms")
-        return res
-
-    return log
-
-
-@record_time
-def _add(a, b):
-    print("klui")
-    time.sleep(1)
-    print("jxuu")
-    return a + b
-
-
-def partition(array, low, high):
-    i = low - 1
-    pi = array[high]
-    for j in range(low, high):
-        if array[j] <= pi:
-            i += 1
-            array[i], array[j] = array[j], array[i]
-    array[i + 1], array[high] = array[high], array[i + 1]
-    return i + 1
-
-
-def quick_sort(array, low, high):
-    if low < high:
-        pi = partition(array, low, high)
-        quick_sort(array, low, pi - 1)
-        quick_sort(array, pi + 1, high)
-
-
-def main():
-    array = [1, 5, 4, 6, 9, 3, 2]
-    low, high = 0, len(array) - 1
-    quick_sort(array, low, high)
-    print(array)
-
-
-if __name__ == '__main__':
-    main()
