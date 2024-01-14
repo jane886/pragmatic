@@ -1,0 +1,9 @@
+Python 有哪些数据类型
+1，整型：int
+2，浮点型：float
+3，字符串：str
+4，布尔型：bool
+5，列表：list
+6，元组：tuple
+7，字典：dict
+8，集合：set

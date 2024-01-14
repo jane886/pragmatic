@@ -1,0 +1,9 @@
+有哪些数据结构
+1，数组：array
+2，链表：linked list
+3，栈：stack
+4，队列：queue
+5，散列表：hash table
+6，二叉树：binary tree
+7，堆：heap
+8，图：graph

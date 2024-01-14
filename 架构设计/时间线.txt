@@ -1,0 +1,100 @@
+# 时间线
+
+1，时间线又或者说 feed 流，像我们平常的刷微博首页、推荐列表
+  用户有自己的关注，每个关注者都有自己发布的动态，那怎么把所有关注者发的动态合起来呢
+
+2，假设表设计是这样的
+    - feed 动态表
+        id
+        sender_id 谁发的
+        content
+        created_time
+
+    - user 用户表
+        id
+
+    - follows 关注表
+        id
+        followee_id 被关注者
+        follower_id 关注者
+
+3，拉 -- 从动态表里选出一些数据作为主页
+    sql 查询语句，假设查询前十条:
+    select * from feed（需要知道发布者的动态、名字这些信息，所以用 * 查询）
+        join user on feed.sender_id == user.id （发布者的 id == 关注用户的 id）
+        join follows on follows.followee_id == user.id (关注了哪些人的)
+    where follows.follower_id == current_user_id（当前用户关注的人
+        order by feed.created_time 
+    limit 10
+
+4，一开始的架构
+    发布动态：客户端发布动态请求服务端，直接保存数据库
+    读取动态：客户端发送请求，服务端从数据库读取数据
+
+5，推 -- 架构升级
+    随着数据量增大，微博的一个很大的特征肯定是读大于写。用户一天肯定有多次来刷微博动态，但肯定不会一直在发布动态
+    这样的话随着性能的要求持续增加，就要对系统后续架构的升级
+
+    1）最开始，数据库可以采用主从模式。数据库的读也就是从库可以横向扩容的
+    
+    2）当然一味的增加数据库可能浪费资源。用算法的话叫用空间换时间
+        比如说发布动态的时候不仅写入数据库，还从数据库拿到所有关注者，给所有关注者的关注队列写入一条数据
+        假设放在 redis，id1 用户有一条关注队列或者叫时间队列，id2 用户也有这样一条队列
+        每个用户发布的时候都往关注者的队列里写一条数据，这样的话队列里面的时间线永远是最新的数据了
+        然后客户端看首页看时间线的时候，发请求给服务器，服务器直接从缓存里拿数据，查缓存的时间相比查数据库就快很多
+        但是写入就变慢了，要先写数据库然后查数据库，然后写进缓存
+        这个东西可以叫提前写，可以叫缓存，可以叫用写来换读，可以叫空间换时间
+        Redis 有一个 List 的数据结构可以来做这个事情
+        List 是一个链表，写往头部写，拿从头部拿，因为是链表，所以时间复杂度是 O1
+        Lpush 可以插入头部，Lrange 可以从头部拿数据
+
+        伪代码：
+        def post():
+            db_feed_write(sender_id, content)
+            users = db_follows_follower(current_user_id)
+            for u in users:
+                cache_write(u.id, content)
+        
+        def timeline():
+            data = cache_read(current_user_id)
+            return data
+
+6，推拉结合
+    这样的话在某些情况下还是会有问题
+    比如说某个大 V 粉丝有几百万，这时发布了一条动态，那么这时候就要给所有关注了他的用户的这个时间线上增加一条记录
+    在写入缓存的时候，这时查到的粉丝量大，写进缓存的时间就变得很长了，这时请求迟迟不响应可能会让用户觉得系统不流畅
+    
+    1）可以在写入缓存的时候换成异步写，比如加消息队列，拿到关注列表后就放进消息队列，让 worker 去消费来写入缓存
+    
+    2）可以从多维度来区分情况，一部分用推、一部分用拉，来推拉结合
+     -- 小 V 用推、大 V 用拉
+     -- 根据有价值的而用户、比如充钱的用户、活跃粉、僵尸粉来区分。比如在 follows 里增加一个 active 参数
+
+        伪代码：
+        def post():
+            db_feed_write(sender_id, content)
+            # 大 V active 可以全部设置为 0
+            users = db_follows_follower_active(current_user_id)
+            for u in users:
+                cache_write(u.id, content)
+        
+        def timeline():
+            data_active = cache_read(current_user_id)
+            data_inactive = db_pull_inactive(current_user_id)
+            data = sorted(data_active + data_inactive)[:10] -- 这里可以做一些额外优化，合并这里可以用归并排序
+            return data
+
+    3）可以在晚上空闲时间跑数据，根据活跃度、是否用iphone 等等算法来设置 follows 的 active
+
+7，架构扩容
+    由 server、db、Redis、消息队列 组成
+    - db 主从扩容、数据量增多还可以分片，每个片都有主从
+        分片键：user 表用 id，feed 表用 sender_id，follows 表用 follower_id
+        分片这里要考虑下数据局部性，如果数据都在同一分片的话这样操作会更容易些，这样就只有硬盘时间消耗，没有更多的网络 IO 消耗，
+        让数据都挨在一起会更高效
+
+    - Redis 扩容 - 集群，哨兵
+
+    - 消息队列 - 集群
+
+    - server - Nginx、dns 负载均衡
