@@ -1,0 +1,9 @@
+NVIDIA Triton 推理服务器提供针对 CPU 和 GPU 进行优化的云和边缘推理解决方案。
+
+Triton Inference Server 是一款开源推理服务软件，可简化 AI 推理。
+ Triton 使团队能够部署来自多个深度学习和机器学习框架的任何 AI 模型，包括 TensorRT、TensorFlow、PyTorch、ONNX、OpenVINO、Python、RAPIDS FIL 等。 
+ Triton 推理服务器支持在 NVIDIA GPU、x86 和 ARM CPU 或 AWS Inferentia 上跨云、数据中心、边缘和嵌入式设备进行推理。
+ Triton 推理服务器为许多查询类型提供优化的性能，包括实时、批量、集成和音频/视频流。 
+ Triton 推理服务器是 NVIDIA AI Enterprise 的一部分，NVIDIA AI Enterprise 是一个软件平台，可加速数据科学管道并简化生产型 AI 的开发和部署。
+
+

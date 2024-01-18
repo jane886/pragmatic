@@ -1,0 +1,56 @@
+FastChat 
+
+因为之前的模型部署这块项目里是基于每个模型然后新建一个子模块来作为推理框架和提供推理服务，
+通过调研了市面上相关的部署推理框架，然后结合公司内部当前正在应用和准备实验的语言模型，
+然后采用了 FastChat 这个开源平台推理框架来作为统一基座，通过 FastChat 这个平台加上公司在训练、推理相关方面的逻辑处理，
+构建了统一部署框架来推动模型部署推理服务这一块的快速和节省时间成本
+
+
+
+1，是 2023 年非常知名的一个大语言模型项目，该项目不仅提供了大语言模型全量参数微调、Lora参数微调、模型推断、模型量化、模型部署及调度等全套的源代码，
+  而且还开源了他们基于LLaMA2 底座进行指令微调的一系列Vicuna 模型权重，因此非常适合学习和使用。
+
+
+2，FastChat是一个用于训练、部署和评估基于大型语言模型的聊天机器人的开放平台。其核心功能包括：
+
+    最先进模型的权重、训练代码和评估代码（例如Vicuna、FastChat-T5）。
+    基于分布式多模型的服务系统，具有Web界面和与OpenAI兼容的RESTful API
+
+3，支持的模型
+  FastChat支持多种模型，包括Vicuna、Alpaca、Baize、ChatGLM、Dolly、Falcon、FastChat-T5、GPT4ALL、Guanaco、MTP、OpenAssistant、RedPajama、StableLM、WizardLM等等。
+
+
+FastChat Serving with Web GUI 启动方式
+1，fastchat/serve/controller.py
+    1.1，model_adapters 数组
+        注册模型适配器类
+        适配器类包含有模型匹配方法、模型加载、匹配对话模板方法等
+
+    1.2，conv_templates 数组
+        注册对话模板类
+        模板类主要包括对话双方提示的信息
+
+
+2，fastchat/serve/model_worker.py
+    2.1，根据启动命令的路径参数来加载到 controller 容器里的对应模型
+    2.2，针对模型的状态 健康检查心跳
+    2.3，封装的 API，包括获取模型的状态、详情、根据请求 input 生成响应或者流响应
+
+
+3，fastchat/serve/gradio_web_server.py || fastchat/serve/gradio_web_server_multi.py
+    3.1，model_info 字典
+        注册模型信息，包括模型名、描述、官方链接等
+    3.2，根据启动命令的 controller-url 拿到当前已经注册的所有模型
+    3.3，根据浏览器上选择的模型发起对话和响应
+
+
+
+FastChat 两种启动方式，都要改动到下面几个文件
+文档地址：https://github.com/lm-sys/FastChat/blob/main/docs/arena.md#how-to-add-a-new-model
+
+文件变动：
+1，conversation.py       注册对话模板（可以用 API 形式注册
+
+2，model_adapter.py      注册适配器、根据启动命令的模型地址匹配到模型，加载模型（只能手动添加注册
+
+3，model_registry.py     注册模型信息（可以用 API 形式注册

@@ -1,0 +1,48 @@
+Transformer
+
+Transformer模型，基于encoder-decoder架构，抛弃了传统的RNN、CNN模型，仅由Attention机制实现，并且由于encoder端是并行计算的，训练时间大大缩短。
+Transformer模型广泛应用于NLP领域，机器翻译、文本摘要、问答系统等等，目前火热的Bert模型就是基于Transformer模型构建的
+
+transformer采用encoder-decoder架构
+    1，Encoder具有两层结构，self-attention和前馈神经网络。
+        self-attention计算句子中的每个词都和其他词的关联，从而帮助模型更好地理解上下文语义，
+        引入Muti-Head attention后，每个头关注句子的不同位置，增强了Attention机制关注句子内部单词之间作用的表达能力。
+        
+        前馈神经网络为encoder引入非线性变换，增强了模型的拟合能力。
+    2，Decoder接受output输入的同时接受encoder的输入，帮助当前节点获取到需要重点关注的内容
+
+Transformer为什么需要进行Multi-head Attention
+    原论文中说到进行Multi-head Attention的原因是将模型分为多个头，形成多个子空间，可以让模型去关注不同方面的信息，最后再将各个方面的信息综合起来。
+    其实直观上也可以想到，如果自己设计这样的一个模型，必然也不会只做一次attention，多次attention综合的结果至少能够起到增强模型的作用，
+    也可以类比CNN中同时使用多个卷积核的作用，直观上讲，多头的注意力有助于网络捕捉到更丰富的特征/信息。
+
+Transformer相比于RNN/LSTM，有什么优势？为什么？
+    1，RNN系列的模型，并行计算能力很差。
+      RNN并行计算的问题就出在这里，因为 T 时刻的计算依赖 T-1 时刻的隐层计算结果，
+      而 T-1 时刻的计算依赖 T-2 时刻的隐层计算结果，如此下去就形成了所谓的序列依赖关系。
+
+    2，Transformer的特征抽取能力比RNN系列的模型要好。
+
+    但是值得注意的是，并不是说Transformer就能够完全替代RNN系列的模型了，任何模型都有其适用范围，
+    同样的，RNN系列模型在很多任务上还是首选，熟悉各种模型的内部原理，知其然且知其所以然，
+    才能遇到新任务时，快速分析这时候该用什么样的模型，该怎么做好。
+
+为什么说Transformer可以代替seq2seq？
+    seq2seq缺点：这里用代替这个词略显不妥当，seq2seq虽已老，但始终还是有其用武之地，
+    seq2seq最大的问题在于将Encoder端的所有信息压缩到一个固定长度的向量中，并将其作为Decoder端首个隐藏状态的输入，
+    来预测Decoder端第一个单词(token)的隐藏状态。
+    在输入序列比较长的时候，这样做显然会损失Encoder端的很多信息，而且这样一股脑的把该固定向量送入Decoder端，
+    Decoder端不能够关注到其想要关注的信息。
+
+    Transformer优点：
+        transformer不但对seq2seq模型这两点缺点有了实质性的改进(多头交互式attention模块)，而且还引入了self-attention模块，
+        让源序列和目标序列首先“自关联”起来，这样的话，源序列和目标序列自身的embedding表示所蕴含的信息更加丰富，
+        而且后续的FFN层也增强了模型的表达能力，并且Transformer并行计算的能力是远远超过seq2seq系列的模型，
+        因此我认为这是transformer优于seq2seq模型的地方。
+
+
+Transformer模型包含哪些模块？
+    Embedding
+    Encoder
+    Decoder
+    Output

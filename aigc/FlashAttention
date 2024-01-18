@@ -1,0 +1,47 @@
+FlashAttention
+
+1，Flash Attention更多的是关于正确利用内存GPU SRam，而这 Paged Attention 更多的是关于更好地使用操作系统/CPU内存
+2，FlashAttention减少内存读/写，而PagedAttention减少内存浪费
+
+
+FlashAttention：具有 IO 感知功能的快速、内存高效的精确注意力
+
+  由于自注意力的时间和内存复杂度是序列长度的二次方，因此 Transformer 在长序列上速度缓慢且需要大量内存。
+  近似注意力方法试图通过权衡模型质量来降低计算复杂性来解决这个问题，但通常无法实现挂钟加速。
+  我们认为，一个缺失的原则是让注意力算法具有 IO 感知能力——考虑 GPU 内存级别之间的读写。
+  
+  我们提出了 FlashAttention，这是一种 IO 感知的精确注意算法，它使用平铺来减少 GPU 高带宽内存 (HBM) 和 GPU 片上 SRAM 之间的内存读/写次数。
+  我们分析了 FlashAttention 的 IO 复杂性，表明它比标准 Attention 需要更少的 HBM 访问，并且对于一系列 SRAM 大小来说是最佳的。
+  我们还将 FlashAttention 扩展到块稀疏注意力，产生比任何现有近似注意力方法更快的近似注意力算法。 
+  FlashAttention 训练 Transformer 的速度比现有基线更快：与 MLPerf 1.1 训练速度记录相比，BERT-large（序列长度 512）的端到端挂钟加速提高了 15%，GPT-large 加速了 3 × 2（序列长度 1K），以及 2.4 × 远程竞技场加速（序列长度 1K-4K）。 
+  
+  FlashAttention 和块稀疏 FlashAttention 可在 Transformers 中实现更长的上下文，从而产生更高质量的模型（GPT-2 上的困惑度提高 0.7，长文档分类的提升点提高 6.4 个点）和全新的功能：第一个实现比偶然更好的 Transformer Path-X 挑战（序列长度 16K，准确度 61.4%）和 Path-256（序列长度 64K，准确度 63.1%）的性能。
+
+
+FlashAttention-2：更快的注意力以及更好的并行性和工作分区
+
+  序列长度 -- Sequence Length是指LLM能够处理的文本的最大长度，越长，自然越有优势：
+    更强的记忆性。更多轮的历史对话被拼接到对话中，减少出现遗忘现象
+    长文本场景下体验更佳。比如文档问答、小说续写等
+
+  将 Transformer 扩展到更长的序列长度一直是过去几年的一个主要问题，有望提高语言建模和高分辨率图像理解的性能，并解锁代码、音频和视频生成方面的新应用。
+  注意力层是扩展到更长序列的主要瓶颈，因为它的运行时间和内存随着序列长度呈二次方增加。 
+  FlashAttention [5] 利用非对称 GPU 内存层次结构带来显着的内存节省（线性而不是二次）和运行时加速（与优化基线相比 2-4），且没有近似值。
+  然而，FlashAttention 的速度仍然不如优化矩阵乘法 (GEMM) 操作，仅达到理论最大 FLOPs/s 的 25-40%。
+  我们观察到效率低下的原因是不同线程块之间的工作划分不理想以及 GPU 上的扭曲，导致低占用率或不必要的共享内存读/写。
+  
+  我们提出 FlashAttention-2，通过更好的工作分区来解决这些问题。
+  特别是，我们（1）调整算法以减少非 matmul FLOP 的数量（2）跨不同线程块并行化注意力计算（即使对于单个头）以增加占用率，以及（3）在每个线程块内，在 warp 之间分配工作以减少通过共享内存的通信。
+  与 FlashAttention 相比，这些速度提高了约 2 倍，达到 A100 上理论最大 FLOPs/s 的 50-73%，接近 GEMM 操作的效率。我们根据经验验证，当使用端到端来训练 GPT 式模型时，FlashAttention-2 的训练速度高达每 A100 GPU 225 TFLOPs/s（模型 FLOPs 利用率为 72%）。
+
+
+我们评估使用 FlashAttention-2 训练 Transformer 模型的影响。
+  标杆关注：
+   我们测量了 FlashAttention-2 在不同序列长度上的运行时间，并将其与 PyTorch、FlashAttention 和 Triton 中的 FlashAttention 中的标准实现进行比较。
+   我们确认 FlashAttention-2 比 FlashAttention 快 1.7-3.0，比 Triton 中的 FlashAttention 快 1.3-2.5，比标准注意力实现快 3-10。
+   FlashAttention-2 的速度高达 230 TFLOPs/s，是 A100 GPU 上理论最大 TFLOPs/s 的 73%。
+ 
+  端到端训练速度
+    当使用端到端在 2k 或 8k 序列长度上训练大小为 1.3B 和 2.7B 的 GPT 式模型时，与 FlashAttention 和 2.8 相比，
+    FlashAttention-2 的速度提升高达 1.3与没有 FlashAttention 的基线相比，速度有所提升。
+    每个 A100 GPU 的 FlashAttention-2 速度高达 225 TFLOPs/s（模型 FLOPs 利用率为 72%）。

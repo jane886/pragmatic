@@ -1,0 +1,71 @@
+Seldon Core：速度极快、行业就绪的机器学习
+
+1，一个开源平台，用于在 Kubernetes 上大规模部署机器学习模型。
+2，Seldon 核心将您的 ML 模型（Tensorflow、Pytorch、H2o 等）或语言包装器（Python、Java 等）转换为生产 REST/GRPC 微服务。
+3，Seldon 可以扩展到数千个生产机器学习模型，并提供开箱即用的高级机器学习功能，包括高级指标、请求日志记录、解释器、离群值检测器、A/B 测试、金丝雀等。
+4，通过我们预先打包的推理服务器和语言包装器，可以简化使用 Seldon Core 部署模型的过程。
+    MLFLOW_SERVER
+    SKLEARN_SERVER
+    TEMPO_SERVER
+    TENSORFLOW_SERVER
+    TRITON_SERVER
+    XGBOOST_SERVER
+    自定义推理服务器--CUSTOM_INFERENCE_SERVER
+
+5，Seldon Core 的主要组件：
+    可重用和不可重用模型服务器
+    用于容器化模型的语言包装器
+    SeldonDeployment CRD 和 Seldon Core Operator
+    用于高级推理图的服务编排器
+    以及与第三方系统的集成：
+        Kubernetes Ingress 与Ambassador 和 Istio 集成
+        Metrics with Prometheus Prometheus 的指标
+        Tracing with Jaeger  与 Jaeger 一起追踪
+        OpenApi 端点文档
+
+6，为什么我不直接用 Flask 包装我的模型呢？
+    以下是选择 Seldon Core 的一些好处：
+        所有艰苦的工作已经完成
+        开箱即用的复杂推理图
+        可重用的模型服务器（构建一次，部署多次）
+        与指标和跟踪解决方案集成
+        自动入口配置
+        Seldon Core 经过了由开源和商业用户组成的广泛社区的考验
+
+7，SeldonDeployment（简称 sdep）的 pod 中都包含一个 engine 容器。
+这个 engine 容器，是由 seldon-manager 服务为每个 sdep 插入的，
+用于满足复杂推理场景的需求，如合并(Combine)多个模型推理结果，推理请求处理（Transform-Input），推理结果转换（Transform-Output），以及推理请求路由等对模型推理的请求和结果进行编排
+
+8，启动过程很清晰简洁的，主要包含如下 4 个步骤：
+    定义及解析命令行参数
+    加载模型
+    定义 Rest 服务
+    启动进程
+  当 sdep 资源创建后，manager 服务为其创建了一个 pod。这个 pod 包含了四个 container
+  四个 container 的作用和关系，分别如下：
+    init 容器：根据 sdep 的参数 modelUri，从 gs 获取模型文件，并保存到/mnt/models
+
+    tfserving 容器：从/mnt/models 加载模型，并通过 2000/2001 端口提供服务
+
+    mnist-model 容器：从其使用的 image 可知，这是一个 proxy 服务，主要实现协议转换，即 seldon 协议请求，转换成 tensorflow 协议请求
+
+    engine 容器：主要用于支持 sdep 资源的 graph 功能，即可以将多个模型服务分别进行打分及组合。将在后续文章继续展开介绍四个 container 的作用和关系，分别如下：
+
+    init 容器：根据 sdep 的参数 modelUri，从 gs 获取模型文件，并保存到/mnt/models
+
+    tfserving 容器：从/mnt/models 加载模型，并通过 2000/2001 端口提供服务
+
+    mnist-model 容器：从其使用的 image 可知，这是一个 proxy 服务，主要实现协议转换，即 seldon 协议请求，转换成 tensorflow 协议请求
+
+    engine 容器：主要用于支持 sdep 资源的 graph 功能，即可以将多个模型服务分别进行打分及组合。将在后续文章继续展开介绍
+
+
+9，seldon 的 manager 服务，即 seldon-controller-manager，这是一个 k8s 的 Operator 服务，
+    负责管理所有 SeldonDeployment（简称 sdep）资源的生命周期，包括创建，修改及删除。
+    每当新的 sdep 资源被创建时，manager 服务会为其创建相关的 deployment 及 service。
+
+
+
+
+
+ 
