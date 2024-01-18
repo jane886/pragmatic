@@ -1,0 +1,41 @@
+vllm 优点
+1，PagedAttention是vLLM的核心技术，它解决了LLM服务中内存的瓶颈问题。
+  
+  传统的注意力算法在自回归解码过程中，需要将所有输入令牌的注意力键和值张量存储在GPU内存中，以生成下一个令牌。
+  这些缓存的键和值张量通常被称为KV缓存。
+  PagedAttention采用了虚拟内存和分页的经典思想，允许在非连续的内存空间中存储连续的键和值。通过将每个序列的KV缓存划分为块，PagedAttention可以高效地进行注意力计算。
+  PagedAttention的内存利用效率接近最优，仅浪费不到4%的内存。此外，PagedAttention还支持高效的内存共享，进一步减少了复杂采样算法的内存开销，提高了吞吐量。
+
+2，其中vllm使用的是自定义的OPTAttention，其中attention部分调用了xformers库（xformers调用的flash-attention库）。huggingface的实现在modeling_opt.py的OPTDecoderLayer中。
+
+3，vLLM使用了PageAttention技术，对模型推理进行加速。
+
+但实际测试中，单batch的推理和HuggingFace的推理相比，并无明显优势。多batch推理时，有明显速度优势。
+
+问题：请问连续batching里，比如max seq_len=2048，第一个seq用了2000个，第二个不就只能用个位数的了嘛？
+回答：他不是一共2048，是每个batch的seq都可以最大2048
+问题：连续batching是将seq横向拼接，输入进模型的时候，他们长度不一样怎么办呀？
+回答：这个是同时进行多个seq推理，
+ 当有一个比较短的seq结果推理完成，其他结果仍在推理时。从还在等待的seq中选一个push到刚结束的地方，继续并行推理。这个2048是指batch中的每个seq最多推理到长度2048，如果没到结束条件，则继续推理。并不是整个batch只能推理2048次。
+只要有一个seq还没结束，整个batch会一直持续推理。
+如果最后只有一个seq推理结果特别长，那么整个batch就对这一个seq一直推理到结束（达到终止符或者长度达到2048）。最后面这段时间的GPU利用率肯定是比较低的，和普通批处理一样低。
+
+4，SamplingParams 是对 sampling 过程中要用到的参数的封装，它的作用类似 dataclass，后续 sampling（greedy/beam search）时候用到。
+
+5，FastChat 是一个开放平台，用于训练、服务和评估基于LLM 的ChatBot。vLLM 是一个由加州伯克利分校、斯坦福大学和加州大学圣迭戈分校的研究人员开发的LLM 服务系统。 通过FastChat 和vLLM，开发者可以快速加载魔搭的模型进行推理。
+
+6，vLLM 具有诸多特点，其快速体现在:
+
+最好的服务吞吐性能
+使用 PagedAttention 优化 KV cache 内存管理
+动态 batch
+优化的 CUDA kernels
+其易用性体现在:
+
+与 HuggingFace 模型无缝集成（目前支持GPT2, GPTNeo, LLaMA, OPT 系列）
+高吞吐量服务与各种 decoder 算法，包括并行采样、beam search 等
+张量并行(TP)以支持分布式推理
+流输出
+兼容 OpenAI 的 API 服务
+
+7，vLLM 主要用于快速 LLM 推理和服务，其核心是 PagedAttention，这是一种新颖的注意力算法，它将在操作系统的虚拟内存中分页的经典思想引入到 LLM 服务中。在无需任何模型架构修改的情况下，可以做到比 HuggingFace Transformers 提供高达 24 倍的 Throughput。
