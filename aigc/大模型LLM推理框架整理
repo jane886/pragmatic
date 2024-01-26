@@ -1,0 +1,91 @@
+1，自 ChatGPT 面世以来，引领了大模型时代的变革，除了大模型遍地开花以外，承载大模型进行推理的框架也是层出不穷，
+本文主要整理了业界知名度较高的一些大模型推理框架。
+
+    1，vLLM
+        vLLM是一个开源的大模型推理加速框架，通过PagedAttention高效地管理attention中缓存的张量，
+        实现了比HuggingFace Transformers高14-24倍的吞吐量。
+
+        PagedAttention 是 vLLM 的核心技术，它解决了LLM服务中内存的瓶颈问题。
+        传统的注意力算法在自回归解码过程中，需要将所有输入Token的注意力键和值张量存储在GPU内存中，以生成下一个Token。
+        这些缓存的键和值张量通常被称为KV缓存。
+        主要特性
+            通过PagedAttention对 KV Cache 的有效管理
+            传入请求的continus batching，而不是static batching
+            支持张量并行推理
+            支持流式输出
+            兼容 OpenAI 的接口服务
+            与 HuggingFace 模型无缝集成
+        业界案例
+            vLLM 已经被用于 Chatbot Arena 和 Vicuna 大模型的服务后端。
+        与其他框架（HF、TGI）的性能对比
+            vLLM 的吞吐量比 HF 高 14 - 24 倍，比 TGI 高 2.2 - 2.5 倍。
+
+
+    2，HuggingFace TGI
+        Text Generation Inference（TGI）是 HuggingFace 推出的一个项目，作为支持 HuggingFace Inference API 和
+        Hugging Chat 上的LLM 推理的工具，旨在支持大型语言模型的优化推理。
+
+        主要特性
+            支持张量并行推理
+            支持传入请求 Continuous batching 以提高总吞吐量
+            使用 flash-attention 和 Paged Attention 在主流的模型架构上优化用于推理的 transformers 代码。注意：并非所有模型都内置了对这些优化的支持。
+            使用bitsandbytes(LLM.int8())和GPT-Q进行量化
+            内置服务评估，可以监控服务器负载并深入了解其性能
+            轻松运行自己的模型或使用任何 HuggingFace 仓库的模型
+            自定义提示生成：通过提供自定义提示来指导模型的输出，轻松生成文本
+            使用 Open Telemetry，Prometheus 指标进行分布式跟踪
+        支持的模型
+            BLOOM
+            FLAN-T5
+            Galactica
+            GPT-Neox
+            Llama
+            OPT
+            SantaCoder
+            Starcoder
+            Falcon 7B
+            Falcon 40B
+            MPT
+            Llama V2
+            Code Llama
+        适用场景
+            依赖 HuggingFace 模型，并且不需要为核心模型增加多个adapter的场景。
+
+
+    3，FasterTransformer
+        NVIDIA FasterTransformer (FT) 是一个用于实现基于Transformer的神经网络推理的加速引擎。
+        它包含Transformer块的高度优化版本的实现，其中包含编码器和解码器部分。
+        使用此模块，可以运行编码器-解码器架构模型（如：T5）、仅编码器架构模型（如：BERT）和仅解码器架构模型（如：GPT）的推理。
+
+        FT框架是用C++/CUDA编写的，依赖于高度优化的 cuBLAS、cuBLASLt 和 cuSPARSELt 库，可以在 GPU 上进行快速的 Transformer 推理。
+
+        与 NVIDIA TensorRT 等其他编译器相比，FT 的最大特点是它支持以分布式方式进行 Transformer 大模型推理。
+        
+        FasterTransformer 中的优化技术
+            与深度学习训练的通用框架相比，FT 能够获得更快的推理流水线以及基于 Transformer 的神经网络具有更低的延迟和更高的吞吐量。
+            FT 对 GPT-3 和其他大型 Transformer 模型进行的一些优化技术包括：
+
+            层融合（Layer fusion）
+                这是预处理阶段的一组技术，将多层神经网络组合成一个单一的神经网络，将使用一个单一的核（kernel）进行计算。
+                这种技术减少了数据传输并增加了数学密度，从而加速了推理阶段的计算。
+                例如， multi-head attention 块中的所有操作都可以合并到一个核（kernel）中。
+            自回归模型的推理优化(激活缓存)
+                为了防止通过Transformer重新计算每个新 token 生成器的先前的key和value，FT 分配了一个缓冲区来在每一步存储它们。
+                虽然需要一些额外的内存使用，但 FT 可以节省重新计算的成本。相同的缓存机制用于 NN 的多个部分。
+        支持的模型
+            目前，FT 支持了 Megatron-LM GPT-3、GPT-J、BERT、ViT、Swin Transformer、Longformer、T5 和 XLNet 等模型。
+            在 GitHub 上的 FasterTransformer库中可以查看最新的支持矩阵。
+
+        存在的问题
+            英伟达新推出了TensorRT-LLM，相对来说更加易用，后续FasterTransformer将不再为维护了。
+
+
+2，尽管LLM推理框架有很多，但每个框架都有其特定的目的。 以下是需要考虑的一些关键点：
+
+    当批量提示交付需要最大速度时，请使用 vLLM。
+    如果你需要本机 HuggingFace 支持并且不打算为核心模型使用多个适配器，请选择文本生成推理。
+    如果速度对你很重要并且你计划在 CPU 上运行推理，请考虑 CTranslate2。
+    如果你想将适配器连接到核心模型并利用 HuggingFace 代理，请选择 OpenLLM，特别是如果你不仅仅依赖 PyTorch。
+    考虑使用 Ray Serve 来实现稳定的管道和灵活的部署。 它最适合更成熟的项目。
+    如果你想在客户端（边缘计算）（例如 Android 或 iPhone 平台）本地部署 LLM，请使用 MLC LLM。
+    如果你已经拥有 DeepSpeed 库的经验并希望继续使用它来部署 LLM，请使用 DeepSpeed-MII。
