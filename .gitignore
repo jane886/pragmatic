@@ -130,3 +130,4 @@ dmypy.json
 *.iml
 *.xml
 .idea/*
+.DS_Store

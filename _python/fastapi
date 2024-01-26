@@ -1,0 +1,5 @@
+FastAPI 是一个高性能的 Web 框架，它基于 Python 语言。下面是 FastAPI 的一些主要优势：
+
+高性能：FastAPI 基于 Starlette 框架构建，使用异步（async）处理请求。
+    它利用 Python 3.7+ 中的新特性 asyncio 和 await，可以处理大量并发请求并实现高吞吐量
+    
