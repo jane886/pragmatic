@@ -1,0 +1,70 @@
+1，消息堆积原因
+    消息堆积即消息没及时被消费，是生产者生产消息速度快于消费者消费的速度导致的。
+    消费者消费慢可能是因为：本身逻辑耗费时间较长、阻塞了。
+
+    预防措施
+        生产者
+            减少发布频率
+            考虑使用队列最大长度限制
+        消费者
+            增加消费者的处理能力   //优化代码；使用JDK的队列缓存数据，多线程去处理（若考虑顺序问题，就采用单例线程）
+            默认情况下，rabbitmq消费者为单线程串行消费（org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer类的concurrentConsumers与txSize（对应prefetchCount）都是1），设置并发消费两个关键属性concurrentConsumers和prefetchCount。concurrentConsumers：设置的是对每个listener在初始化的时候设置的并发消费者的个数；prefetchCount：每次从broker里面取的待消费的消息的个数。
+        配置方法：修改application.properties： spring.rabbitmq.listener.concurrency=m spring.rabbitmq.listener.prefetch=n Spring Amqp的解释： prefetchCount(prefetch) The number of messages to accept from the broker in one socket frame. The higher this is the faster the messages can be delivered, but the higher the risk of non-sequential processing. Ignored if the acknowledgeMode is NONE. This will be increased, if necessary, to match the txSize concurrentConsumers(concurrency) The number of concurrent consumers to initially start for each listener.
+
+    综合（使用缓存）
+        生产者端缓存数据，在mq被消费完后再发送到mq，打破发送循环条件。
+        设置合适的qos值（channel.BasicQos()方法：每次从队列拉取的消息数量），当qos值被用光，
+        而新的ack没有被mq接收时，就可以跳出发送循环，去接收新的消息。
+        
+        消费者主动block接收进程，消费者感受到接收消息过快时主动block，利用block和unblock方法调节接收速率，
+        当接收线程被block时，跳出发送循环。
+
+    已出事故的解决措施
+        情况1：堆积的消息还需要使用
+            方案1：简单修复
+
+            修复consumer的问题，让他恢复消费速度，然后等待几个小时消费完毕
+
+            方案2：复杂修复
+
+            临时紧急扩容了，具体操作步骤和思路如下：
+
+            1）先修复consumer的问题，确保其恢复消费速度
+            2）新建一个topic，partition是原来的10倍，临时建立好原先10倍或者20倍的queue数量
+            3）然后写一个临时的分发数据的consumer程序，这个程序部署上去消费积压的数据，消费之后不做耗时的处理，直接均匀轮询写入临时建立好的10倍数量的queue
+            4）接着临时征用10倍的机器来部署consumer，每一批consumer消费一个临时queue的数据
+            5）这种做法相当于是临时将queue资源和consumer资源扩大10倍，以正常的10倍速度来消费数据
+            6）等快速消费完积压数据之后，得恢复原先部署架构，重新用原先的consumer机器来消费消息
+
+        情况2：堆积的消息不需要使用
+            删除消息即可。（可以在RabbitMQ控制台删除，或者使用命令）。
+
+
+2，如何解决RabbitMQ消息队列的延时以及过期失效问题？消息队列满了以后该怎么处理？数百万消息持续积压几个小时，说说怎么解决？
+
+    提示：出现消息积压，主要是因为消息的消费速度跟不上消息产生的速度。
+
+    消息堆积解决策略1
+        消费者临时扩容，例如：原先是10个消费者，扩容10倍，100个消费者，目的是加快消息消费速度。
+        提示：扩容数量根据实际情况确定。
+
+    消息堆积解决策略2
+        修复消费者问题，消费者本身的问题，主要体现在两个方面: 业务异常和消息处理速度慢。
+
+        如果是消费者自己异常了，导致无法正常消费消息，只要修复异常问题即可。
+        如果是消费者处理速度慢，可以分析下业务代码有没有进一步提升性能的空间，有就优化，没有就走策略1扩容方案。
+    
+    消息堆积解决策略3
+        如果消息堆积的太多，短时间内消费不完（需要几个小时，甚至更长时间），可以做个取舍，
+        反正前面的客户已经得罪了，新的客户不能得罪，我们可以确保新的消息可以正常消费，老的消息慢慢处理。
+
+        可以新开一个队列，让新的消息投递到这个队列，新开一批消费者，处理新的消息，
+        老的队列里面堆积的消息，让一批消费者慢慢跑。
+
+    消息堆积解决策略4
+        如果堆积的消息不重要，直接干掉（删除）队列，创建新的队列，处理新的消息就行，不能在一棵树上吊死。
+
+    消息堆积解决策略5
+        如果消息设置了TTL，这种情况，消息可能因为已经到期，被丢弃了，丢了多少我们不知道，为确保业务消息都被正常消费，
+        这里首先要决绝的是怎么找回丢失的消息，主要思路是根据业务数据，重新投递消息到MQ中，
+        例如：根据订单记录，如果订单未处理，重新投递消息到消息队列。
