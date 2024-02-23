@@ -1,0 +1,19 @@
+1，简介
+服务网格（Service Mesh）是处理服务间通信的基础设施层。它负责构成现代云原生应用程序的复杂服务拓扑来可靠地交付请求。
+在实践中，Service Mesh 通常以轻量级网络代理阵列的形式实现，这些代理与应用程序代码部署在一起，对应用程序来说无需感知代理的存在。
+
+近年来以 Istio 为代表的服务网格蓬勃发展，大有成为下一代语言异构微服务架构的王者之范
+
+目前业界跟微服务相关的开发平台和框架更是不胜枚举：Spring Cloud， Service Fabric，Linkerd，Envoy，Istio ..
+
+
+2，Phil Calçado 在他的这篇博客 https://philcalcado.com/2017/08/03/pattern_service_mesh.html 中详细解释了服务网格的来龙去脉：
+
+从最原始的主机之间直接使用网线相连
+网络层的出现
+集成到应用程序内部的控制流
+分解到应用程序外部的控制流
+应用程序的中集成服务发现和断路器
+出现了专门用于服务发现和断路器的软件包/库，如 Twitter 的 Finagle 和 Facebook 的 Proxygen，这时候还是集成在应用程序内部
+出现了专门用于服务发现和断路器的开源软件，如 Netflix OSS、Airbnb 的 synapse 和 nerve
+最后作为微服务的中间层服务网格出现
