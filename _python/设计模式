@@ -1,0 +1,66 @@
+Python是一种多范式的编程语言，支持多种设计模式。下面列举了一些常见的设计模式，可以在Python中应用：
+
+    单例模式（Singleton Pattern）：确保一个类只有一个实例，并提供全局访问点。
+    工厂模式（Factory Pattern）：使用工厂方法创建对象，将对象的实例化延迟到子类中。
+    抽象工厂模式（Abstract Factory Pattern）：提供一个接口，用于创建相关或依赖对象的家族，而不需要指定具体类。
+    建造者模式（Builder Pattern）：将一个复杂对象的构建过程与其表示分离，使同样的构建过程可以创建不同的表示。
+    原型模式（Prototype Pattern）：通过复制现有对象来生成新对象，而不是通过实例化类。
+    适配器模式（Adapter Pattern）：将一个类的接口转换为客户端所期望的另一个接口，以解决接口不兼容的问题。
+    装饰器模式（Decorator Pattern）：动态地将额外的功能附加到对象上，提供了比继承更有弹性的替代方案。
+    代理模式（Proxy Pattern）：为其他对象提供一种代理以控制对这个对象的访问。
+    观察者模式（Observer Pattern）：定义对象之间的一对多依赖关系，当一个对象的状态发生变化时，其所有依赖对象都会收到通知。
+    策略模式（Strategy Pattern）：定义一系列算法，将每个算法封装起来，并使它们可以互相替换，使算法的变化独立于使用算法的客户端。
+    模板方法模式（Template Method Pattern）：定义一个算法的骨架，将一些步骤延迟到子类中实现。
+    迭代器模式（Iterator Pattern）：提供一种方法访问一个容器对象中各个元素，而不暴露该对象的内部表示。
+    状态模式（State Pattern）：允许对象在其内部状态改变时改变它的行为。
+    责任链模式（Chain of Responsibility Pattern）：将请求的发送者和接收者解耦，使多个对象都有机会处理该请求。
+    访问者模式（Visitor Pattern）：定义了一个新的操作，可以在不改变被操作对象的类的前提下定义该操作。
+
+这只是一小部分常见的设计模式，每种模式都有其特定的用途和适用场景。
+在实际开发中，根据具体的问题和需求，选择合适的设计模式来提高代码的可维护性、灵活性和可复用性。
+
+
+工厂模式应用场景
+工厂模式是一种常见的设计模式，用于创建对象并将对象的实例化过程延迟到子类中。工厂模式适用于以下情况：
+    当一个类不知道要创建的对象的确切类时。
+    当一个类希望由子类来指定所创建的对象时。
+    当需要通过一些通用的操作来创建对象，而不是直接使用构造函数。
+
+class Animal:
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return "Woof!"
+
+class Cat(Animal):
+    def speak(self):
+        return "Meow!"
+
+class AnimalFactory:
+    def create_animal(self, animal_type):
+        if animal_type == "dog":
+            return Dog()
+        elif animal_type == "cat":
+            return Cat()
+        else:
+            raise ValueError("Invalid animal type.")
+
+# 使用工厂创建对象
+factory = AnimalFactory()
+dog = factory.create_animal("dog")
+cat = factory.create_animal("cat")
+
+# 调用对象的方法
+print(dog.speak())  # 输出: Woof!
+print(cat.speak())  # 输出: Meow!
+
+在上面的示例中，Animal是一个基类，Dog和Cat是继承自Animal的子类。
+AnimalFactory是工厂类，通过create_animal方法根据输入的类型动态创建不同的动物对象。
+
+通过工厂模式，我们可以通过一个统一的接口来创建对象，而无需在客户端代码中直接使用具体的构造函数。
+这样可以实现对象的解耦和灵活性，使得客户端代码更加可扩展和可维护。如果需要添加新的动物类型，只需要在工厂类中添加相应的逻辑，而不需要修改客户端代码。
+
+工厂模式还可以进一步扩展，例如使用抽象工厂模式来创建一组相关的对象家族，或者使用工厂方法模式来将对象的创建委托给子类。
+根据具体的需求和设计，可以选择适合的工厂模式变体。
