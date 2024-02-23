@@ -111,3 +111,15 @@
     在golang中， 大家习惯使用一个封装了业务逻辑的闭包来启动一个goroutine， 该闭包负责管理并发的数据和状态，
     例如闭包从信道中读取数据并传递给业务逻辑， 业务逻辑完全不知道它是在一个goroutine中，
     然后函数的结果被写回另外一个信道，这种职责分离使代码模块化、可测试，并使得api调用简单，无需关注并发问题。
+
+    func process(val int) int {
+    }
+    
+    func runningConcurrently(in <-chan int, out  chan <- int) {
+    go func() {                        // 业务逻辑协程
+        for val := range in {
+            result := process(val)
+            out<- result               // 利用信道来在协程间通信
+        }
+    }
+    }
