@@ -1,0 +1,13 @@
+Redis set 命令
+1，set key value：设置指定key的值
+2，set key value ex seconds：设置指定key的值，并且设置过期时间
+3，set key value px milliseconds：设置指定key的值，并且设置过期时间
+4，set key value nx：设置指定key的值，只有当key不存在的时候才设置
+5，set key value xx：设置指定key的值，只有当key存在的时候才设置
+6，set key value keepttl：设置指定key的值，保留原来的过期时间
+7，set key value ex seconds nx：设置指定key的值，并且设置过期时间，只有当key不存在的时候才设置
+8，set key value ex seconds xx：设置指定key的值，并且设置过期时间，只有当key存在的时候才设置
+9，set key value px milliseconds nx：设置指定key的值，并且设置过期时间，只有当key不存在的时候才设置
+10，set key value px milliseconds xx：设置指定key的值，并且设置过期时间，只有当key存在的时候才设置
+11，set key value keepttl nx：设置指定key的值，保留原来的过期时间，只有当key不存在的时候才设置
+12，set key value keepttl xx：设置指定key的值，保留原来的过期时间，只有当key存在的时候才设置

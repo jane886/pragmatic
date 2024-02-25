@@ -1,0 +1,36 @@
+有许多数据库性能监控工具可供选择，以下是一些常用的数据库性能监控工具：
+
+MySQL Enterprise Monitor：MySQL官方提供的监控工具，提供实时性能监控、告警通知、查询优化建议等功能。
+
+MySQL Workbench：这是由MySQL官方提供的一款强大工具，不仅可以对数据库进行管理、运维，
+    还提供了统计、性能报告和监控等功能。
+
+Percona Monitoring and Management (PMM)：Percona开发的开源监控工具，支持多种数据库，
+    包括MySQL、MariaDB、MongoDB等，提供性能指标、查询分析、数据库诊断等功能。
+
+Datadog：一款云端的监控和分析平台，支持多种数据库，包括MySQL、PostgreSQL、MongoDB等，
+    提供实时监控、告警、性能分析等功能。
+    Datadog不仅可以监控数据库，而且还可以监控你的整个基础设施、应用程序性能等。
+    对于MySQL，他们提供了丰富的监控项，以及一个漂亮的、可定制的仪表板。
+
+Prometheus：一款开源的监控系统，支持多种数据库，包括MySQL、PostgreSQL、MongoDB等，
+    通过采集和存储时间序列数据，提供监控、告警、可视化等功能。
+
+Grafana：一款开源的数据可视化工具，可以与多种监控系统集成，包括Prometheus、InfluxDB等，
+    提供强大的图表和仪表盘功能。
+
+New Relic：一款云端的应用性能监控工具，支持多种数据库，包括MySQL、PostgreSQL、MongoDB等，
+    提供实时性能监控、事务分析、告警等功能。
+
+AppDynamics：一款应用性能监控工具，支持多种数据库，包括MySQL、Oracle、DB2等，
+    提供实时性能监控、事务追踪、自动化分析等功能。
+
+SolarWinds Database Performance Analyzer：这是一款商业工具，可监控各种数据库，
+包括MySQL、Oracle、SQL Server等，提供深层次的性能问题诊断。
+
+Navicat：这是一款强大的数据库管理工具，支持各种数据库系统，包括MySQL、MariaDB、SQL Server、SQLite、Oracle和PostgreSQL等。
+    Navicat包含了一个服务器监控功能，可以监控MySQL和MariaDB的性能并优化SQL查询。
+
+Zabbix：Zabbix是一款开源的企业级IT监控方案，可以监控各种数据库的性能指标，包括MySQL。
+
+这些工具都提供了丰富的功能和可视化界面，可以帮助监控和优化数据库性能。选择合适的工具取决于你使用的数据库类型、需求和预算等因素。

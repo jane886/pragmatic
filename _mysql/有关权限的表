@@ -1,0 +1,39 @@
+MySQL 有关权限的表都有哪几个
+    在MySQL中，权限相关的信息被存储在mysql数据库下的几个系统表中。这些表包括：
+    user表： 存储MySQL服务器的用户账户信息和全局权限信息。全局权限是指在所有数据库的所有表上的权限。
+    db表： 存储每个数据库级别的权限信息，例如某个用户对某个数据库具有何种权限。
+    tables_priv表： 存储每个表级别的权限信息。
+    columns_priv表： 存储每个列级别的权限信息。
+    procs_priv表： 存储存储过程和函数级别的权限信息。
+    proxies_priv表： 存储用户代理权限信息。
+    当管理员通过GRANT，REVOKE等命令修改用户的权限时，MySQL就会在这些表中做相应的更新。
+    注意：直接操作这些系统表（即通过INSERT，UPDATE，DELETE等方式直接修改表数据）来管理权限显得繁琐且容易出错，
+    通常我们都是使用GRANT，REVOKE等命令来更方便安全地管理权限。
+
+
+这些权限表中的信息可以通过哪些方式查询和修改？
+    在MySQL中查询和修改权限信息，通常我们会使用以下几种方式：
+    查询权限：
+    1，**SHOW GRANTS FOR 'user'@'host'**：该命令可以显示给定用户的权限，其中user为用户名，host为主机名。
+    2，SELECT * FROM mysql.user：可以查看mysql.user系统表中记录的有关用户的信息，包括已分配的权限。
+        同样地，你可以查询mysql.db，mysql.tables_priv，mysql.columns_priv，mysql.procs_priv，mysql.proxies_priv
+        等其他权限相关的系统表。
+    
+    修改权限：
+    使用GRANT语句授予权限，例如：
+    授予用户对数据库的权限：GRANT SELECT, INSERT ON database_name.* TO 'username'@'host';
+    授予用户对表的权限：GRANT SELECT, UPDATE ON database_name.table_name TO 'username'@'host';
+    
+    使用REVOKE语句撤销权限，例如：
+    撤销用户对数据库的权限：REVOKE SELECT, INSERT ON database_name.* FROM 'username'@'host';
+    撤销用户对表的权限：REVOKE SELECT, UPDATE ON database_name.table_name FROM 'username'@'host';
+
+    使用ALTER USER语句修改用户信息，例如：
+    修改用户密码：ALTER USER 'username'@'host' IDENTIFIED BY 'new_password';
+    修改用户连接限制：ALTER USER 'username'@'host' WITH MAX_CONNECTIONS 10;
+
+    注意：在操作过程中，你只能修改或查询自己拥有的权限，或者你是超级用户（例如root）时，你可以修改或查询其他用户的权限。
+    直接操作这些系统表（例如通过INSERT，UPDATE，DELETE等方式直接修改表数据）来管理权限显得繁琐且容易出错，
+    在实践中我们通常都会使用GRANT，REVOKE等命令来更方便安全地管理权限。
+
+

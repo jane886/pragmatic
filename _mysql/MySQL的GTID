@@ -1,0 +1,21 @@
+GTID(Global Transaction Identifier)是MySQL 5.6及以上版本引入的全局事务ID。
+这是一种全局唯一的标识符，用来表示MySQL服务器中的每一次事务。
+
+每个GTID在所有服务器中都是唯一的，并且每次进行主从切换时，都可以轻松找到复制的位置，从而使得主从复制和故障恢复更为简洁。
+此外，使用GTID进行复制对主从切换也更为友好，省去了找binary log文件和位置的困扰。
+
+GTID由两部分组成，格式为：uuid:transaction_id
+
+uuid：这部分代表服务器的UUID，每个MySQL服务器的UUID都是唯一的。
+transaction_id：这部分是一个递增的整数，代表在该服务器上提交的事务数量。
+
+在进行复制时，从库接收到主库的GTID，并记录到自己的日志中，以此来追踪复制的进度。
+因此，当主服务器发生故障时，我们可以非常容易地指定一个新的主服务器。
+
+如果要使用GTID进行复制，需要在MySQL的配置文件中指定gtid_mode=ON 和 enforce_gtid_consistency=ON。
+然后，使用CHANGE MASTER TO MASTER_AUTO_POSITION = 1命令告诉从服务器使用GTID来找到复制的位置。
+
+请注意，启用GTID后，所有事务都必须具有GTID。许多管理员发现，某些旧的应用可能会创建在没有GTID下运行的事务，
+此时需要修改这些应用，或者禁用enforce_gtid_consistency选项。然而请记住，禁用这个选项可能会降低数据的一致性。
+
+总的来说，使用GTID可以使MySQL主从复制及切换主库更为简单和可靠。虽然需要一些配置，但在许多情况下，这是值得的。

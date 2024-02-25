@@ -1,0 +1,79 @@
+MySQL中的JOIN子句用于连接两个或多个表，以便基于这些表之间的关系获取数据。
+
+以下是MySQL中常用的几种JOIN方式：
+
+    INNER JOIN：也称为简单的JOIN，返回所有满足JOIN条件的记录。
+    如果在两个表中有匹配的行，则INNER JOIN会返回匹配的行。如果没有匹配的行，则不会返回任何结果。
+
+    示例语句：
+        sql
+        SELECT table1.column1, table2.column2...
+        FROM table1
+        INNER JOIN table2
+        ON table1.matching_column = table2.matching_column;
+
+    LEFT JOIN（或LEFT OUTER JOIN）：返回左表中的所有记录和右表中与之匹配的记录。
+    如果在右表中没有匹配的行，则结果是NULL。
+
+    示例语句：
+        sql
+        SELECT table1.column1, table2.column2...
+        FROM table1
+        LEFT JOIN table2
+        ON table1.matching_column = table2.matching_column;
+
+    RIGHT JOIN（或RIGHT OUTER JOIN）：返回右表中的所有记录和左表中与之匹配的记录。
+    如果在左表中没有匹配的行，则结果是NULL。
+
+    示例语句：
+        sql
+        SELECT table1.column1, table2.column2...
+        FROM table1
+        RIGHT JOIN table2
+        ON table1.matching_column = table2.matching_column;
+
+    FULL JOIN（或FULL OUTER JOIN）： 通过左、右或全连接返回左边和右边表中的记录。
+    这意味着，如果在左表或右表中没有匹配的行，则它会返回标题，
+    但是MySQL不支持FULL OUTER JOIN，需要用UNION合并左连接和右连接来实现。
+
+    示例语句：
+        sql
+        SELECT table1.column1, table2.column2...
+        FROM table1
+        LEFT JOIN table2
+        ON table1.matching_column = table2.matching_column
+        UNION
+        SELECT table1.column1, table2.column2...
+        FROM table1
+        RIGHT JOIN table2
+        ON table1.matching_column = table2.matching_column;
+
+在使用JOIN时，要特别注意JOIN条件和WHERE子句，以避免返回不期望的结果或性能问题。
+
+
+在MySQL中，尽管没有直接的FULL JOIN或者FULL OUTER JOIN，但是可以通过结合使用LEFT JOIN，RIGHT JOIN和UNION来达到类似的效果。
+具体方法如下
+
+在下面的例子中，我们假设有两个表table1和table2，并且我们需要在matching_column上进行join:
+
+    sql
+    SELECT table1.column1, table2.column2...
+    FROM table1
+    LEFT JOIN table2
+    ON table1.matching_column = table2.matching_column
+
+    UNION
+
+    SELECT table1.column1, table2.column2...
+    FROM table1
+    RIGHT JOIN table2
+    ON table1.matching_column = table2.matching_column;
+
+这个查询的第一部分从table1和table2取得所有匹配的行，以及table1中有但table2中没有的行。
+第二部分通过RIGHT JOIN取得在table2中有但是table1中却没有的行。
+
+通过使用UNION操作符将两部分的结果合并起来，我们能够得到一个类似于FULL OUTER JOIN的结果。
+
+需要注意，使用UNION 效率可能相对较低，尤其在处理大的数据库表的时候，因为UNION需要处理和重组所有的返回结果。
+对于不具备FULL OUTER JOIN 或者直接UNION ALL 操作符的数据库系统，这种做法可以是一种可行的备选方案，
+但在可以使用FULL OUTER JOIN或者UNION ALL的数据库系统中，为了性能的考虑，应该尽量避免使用UNION。
