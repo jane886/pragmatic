@@ -1,0 +1,24 @@
+CI/CD，全称是Continuous Integration（持续集成）和 Continuous Deployment/Delivery（持续部署/交付），是现代软件开发流程中非常重要的一环。
+它可以减少手动错误，提高开发效率，敏捷响应市场变化。
+
+以下是一些常用的CI/CD工具：
+    Jenkins：开源的CI/CD工具，拥有强大的插件生态系统。Jenkins 支持各种运行环境和大量的插件，可以实现复杂的构建、测试和部署的自动化流程。
+    GitLab CI/CD：GitLab 提供了内置的CI/CD工具，使用 .gitlab-ci.yml 配置文件可以轻松地创建自动化流程，无需额外的服务或者安装。
+    Travis CI：面向开源项目的 CI/CD 服务，集成在 GitHub 上，轻松与 GitHub 进行协同工作。
+    CircleCI：提供强大的云端CI/CD服务，支持 Docker 容器，并且也能与 GitHub、Bitbucket 等代码托管平台紧密集成。
+    Bamboo：Atlassian公司的一款产品，与Jira、Bitbucket等产品集成非常好。
+    TeamCity：JetBrains公司的一款产品，界面直观，配置灵活，有强大的插件生态。
+    Azure DevOps：Microsoft的产品，提供了完整的开发生命周期管理工具，包括敏捷计划、源代码控制、自动构建、自动部署、测试和工作项追踪。
+以上工具都各有优点，选择哪一款取决于具体的项目需求、团队经验和现有的技术栈。
+
+
+在处理Docker容器时，以下CI/CD工具支持性较好：
+Jenkins： 得益于它强大的插件生态系统，Jenkins提供了Docker插件，可以构建和发布Docker镜像，并且可以使用Docker容器来运行构建任务。
+    对Docker的支持包括在Jenkins的pipeline中构建和发布Docker镜像，或者使用内嵌的Docker功能如Docker Compose。
+GitLab CI/CD：GitLab CI/CD对Docker的支持非常强，无论是使用Docker作为你的runner环境，还是使用.dockercfg文件在runner上登录Docker服务，
+    或者是构建并推送Docker镜像到GitLab's container registry，GitLab都能胜任。
+CircleCI：CircleCI提供了一个名为machine的执行器，它不仅允许你对Docker命令进行完全控制，而且还提供Docker Compose支持。
+    除此之外，还有一个专注于Docker的方便的orb ecosystem，它也以类似pipeline的方式支持Docker。
+Travis CI：Travis CI可以非常轻松地与Docker一起使用。在配置文件.travis.yml中可以指定服务区块使用Docker，构建步骤也可以包括构建和运行Docker容器。
+Azure DevOps：Azure Pipelines 提供了一系列的Docker任务，使得构建、推送或者运行Docker镜像，或者部署到Kubernetes，变得非常简单。
+    你可以在构建和发布pipeline中使用这些任务。
