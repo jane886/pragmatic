@@ -1,0 +1,35 @@
+Kubernetes（常简称为 K8s）是一个开源的、用于自动部署、伸缩和管理容器化应用的平台。它的基本工作原理如下：
+    主节点（Master Node）与工作节点（Worker Node）：K8s 集群有两种主要类型节点，主节点负责管理和控制集群，而工作节点则运行实际的应用程序。
+    API Server：位于主节点的 Kubernetes API 服务器是 Kubernetes 控制面的前端，所有的管理操作都是通过 API 服务器进行。
+    控制器：位于主节点的控制器负责处理后台任务。他们监视 Kubernetes 对象的状态，并在需要时更改这些对象以达到预期的状态。
+    调度器：位于主节点的调度器负责调度新的 Pods 到合适的节点。
+    etcd：etcd 是一个一致且高度可用的键值存储，用于保存 Kubernetes 集群所有的数据。
+    容器运行时：位于工作节点的容器运行时负责运行容器。Kubernetes 支持多种容器运行时，其中最常见的是 Docker。
+    kubelet：位于工作节点的 kubelet 是一个守护程序，用于管理和运行 Pod 内的容器。kubelet 接收 Pod 的规格，确保容器按照该规格运行。
+    kube-proxy：位于工作节点的 kube-proxy 负责为服务提供简单的网络路由，如负载均衡和名称到 IP 地址的解析。
+
+以上是 Kubernetes 的基本工作原理。总的来说，Kubernetes 是一种分布式系统，它的工作原理是通过在许多不同的机器上运行代码来提高资源的利用率，
+并确保应用在一个容器中运行时能够有效地故障自愈。
+
+
+Kubernetes 的一些关键组件和它们是如何相互协作的。
+    Pod：Pod 是 Kubernetes 的最小部署单元，它是一个或多个容器的集合，这些容器共享网络和存储。
+        所有在同一个 Pod 中的容器会在同一个 Node 上，一起启动和停止，同时也能共享一些资源。
+    Service：Service 是一组执行相同任务的 Pod 的抽象。Service 通过 selector 来找到并管理其关联的 Pod，它提供了负载均衡和服务发现的功能。
+        Service 会为选定的 Pod 创建一个虚拟 IP 地址和端口号，其他 Pod 可以使用这个地址和端口来访问 Service。
+    Volume：Volume 是一个目录，包含了 Pod 中一个或多个容器的数据。
+        Volume 的生命周期与 Pod 相关联，Volume 中的数据会一直存在，直到 Pod 被显式地删除。
+    Namespace：Namespace 提供了一个隔离的环境，可以将一个物理集群划分为多个虚拟集群。
+        每个 Namespace 都有自己的资源配额，可以有各自的 Service，Pod 和 Volume。
+    Deployment：Deployment 为 Pod 和 Replicaset 提供了一个声明式的更新方法。
+        你可以定义 Deployment 来创建新的 Replicasets，或者删除旧的 Deployment 和创建新的 Deployment，
+        或者通过更新其 PodTemplateSpec 实现滚动更新。
+    ReplicaSet：ReplicaSet 确保任何时间都有指定数量的 Pod 副本在运行。
+        如果有过多的 Pod，ReplicaSet 会将其删除；如果数量不足，ReplicaSet 会启动更多的 Pod。
+        与副本控制器不同的是，ReplicaSet 支持集合型的 selectors。
+
+当你创建一个 Deployment 时，你需要定义 Pod 的模板和需要运行的 Pod 数量。
+当 Deployment 被创建时，它也会创建一个 ReplicaSet，并给它设定所需的 Pod 数量。
+ReplicaSet 会创建和维护 Pod，确保在任何时候都有指定数量的 Pod 在运行。
+而 Service 则可以为一组执行相同任务的 Pod 提供访问点，外界可以通过 Service 来访问这些 Pod。Volume 则提供了持久化存储。
+以上就是 Kubernetes 的具体工作原理，它通过各个组件的协同工作，提供了一个高效、可扩展的容器化应用管理平台。

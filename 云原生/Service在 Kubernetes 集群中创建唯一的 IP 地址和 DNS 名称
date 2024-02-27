@@ -1,0 +1,7 @@
+Kubernetes 中的 Service 创建其唯一的 IP 地址和 DNS 名称实际上是由 Kube-DNS 或 CoreDNS 这两个系统组件来实现的。
+在 Kubernetes 集群中，当我们创建一个 Service 时，Kubernetes 的 API 服务器会将 Service 的相关信息以资源对象的形式保存到 etcd 中。
+而 Kube-DNS 或 CoreDNS 组件则会持续监听 Kubernetes 的 API 服务器，当有新的 Service 被创建时，它会检测到这个变化，然后为新的 Service 分配一个在集群内部唯一的 IP 地址（Cluster IP）。
+
+同时，Kube-DNS 或 CoreDNS 会为新的 Service 创建一个 DNS 记录。这个 DNS 记录通常形如 <service-name>.<namespace-name>.svc.cluster.local，其中 <service-name> 是你为 Service 分配的名字，<namespace-name> 是 Service 所在的命名空间。通过这个 DNS 记录，其他 Pod 就可以用 DNS 名称来访问这个 Service，而无需知道它的 IP 地址。
+再次强调，Kube-DNS 或 CoreDNS 组件是自动创建和管理这些 Cluster IP 地址和 DNS 记录的。在 Kubernetes 集群中，你只需要创建 Service，并指定其将要代理的 Pod 选择器（Selector），其他的工作都会自动完成。
+由于 Kubernetes Service 提供了稳定的访问接口，确保了当后端的 Pod 发生变化时，前端的 Pod 可以始终稳定地访问服务，因此这个组件在 Kubernetes 的微服务架构中起了至关重要的作用。
