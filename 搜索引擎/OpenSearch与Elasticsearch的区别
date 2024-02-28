@@ -1,0 +1,15 @@
+OpenSearch和Elasticsearch都是搜索和分析引擎，但它们之间存在一些主要的差异：
+
+发展历程: OpenSearch源自Elasticsearch 7.10版本。
+    当Elastic decided to改变Elasticsearch and Kibana的许可证从Apache 2.0变为Server Side Public License (SSPL)，
+    Amazon Web Services (AWS)因此创建了OpenSearch，并承诺将其保留在Apache 2.0开源许可下。
+    因此，OpenSearch是Elasticsearch的一个分支。
+开源协议: OpenSearch继续使用Apache 2.0许可，这是一个相当宽松的开源许可，允许商业使用、修改、分发和私有化。
+    相比之下，Elasticsearch从7.11版本开始则转向更加严格的SSPL许可，虽然SSPL仍然是一个开源许可，
+    但对商业使用有更多限制。
+功能和组件: OpenSearch还包括了一个名为OpenSearch Dashboards的组件，这是一个基于Kibana的开源分支。
+    与Elasticsearch和Kibana一样，OpenSearch和OpenSearch Dashboards在功能上可以说是与前者几乎无差别的，
+    因为它们是从相同的代码库分离出来的。
+社区和支持: 两者在社区支持和商业支持方面也有所不同。Elasticsearch由Elastic公司支持，并拥有一个成熟的社区。
+    而OpenSearch是由AWS支持，而且由于是新创建的项目，因此它的社区相对较新。
+版本: 由于OpenSearch源于Elasticsearch 7.10，因此OpenSearch的版本号从1.0开始，与Elasticsearch的版本号不同。
