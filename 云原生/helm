@@ -1,0 +1,30 @@
+Helm 是 Kubernetes (K8s) 的一个包管理工具，正如 Linux 系统中的 APT 或者 YUM，或者 Python 中的 pip。
+它可以帮助开发者在 Kubernetes 上更快速、更便捷地部署、升级和管理应用程序。
+
+Helm 通过一个叫做 "Chart" 的包格式，将一个或多个 Kubernetes 资源组合在一起，以部署一个完整的应用、服务或者一组相关的服务。
+每个 Chart 包含了运行应用所需要的全部 Kubernetes 资源定义和配置信息，Helm 能够保证部署应用的版本统一和过程复现。
+
+Helm 的主要特点包括：
+    易于管理： Helm 使发布管理变得容易，提供了一个简单的方式来查看、回滚和升级应用。
+    复用： 使用 Helm，你可以创建可复用的部署包。这些包可以被分享给其他 Kubernetes 用户。
+    版本控制： Helm 提供了对 Chart 的版本控制，允许你为一个应用的 Chart 版本打标签，以便在必要时回滚到旧版本。
+    合规性： Helm 允许你定义用于描述 Kubernetes 资源的模板，这意味着你可以创建复合组织合规性要求的模板，以便其他人在你的组织中使用。
+    社区支持： Helm 提供了一个中心化的存储库用于分发 Charts，有许多由社区维护的公共 Charts 可供使用。
+
+简而言之， Helm 通过提供一种简化部署和管理 Kubernetes 应用程序的方式，对 Kubernetes 的应用部署和管理过程进行了优化。
+
+
+在 Helm 中，Chart 是预先配置好的 Kubernetes 资源包，就像软件的安装包那样。
+每个 Chart 是一个包含了一组默认配置和 Kubernetes 对象模板的目录。
+这些对象模板定义了如何创建 Kubernetes 资源，如部署 (Deployments)、服务 (Services)、守护进程集 (DaemonSets) 和其它 Kubernetes 对象。
+所有这些都是为了在 Kubernetes 集群上部署和运行一个具体的应用程序或者服务。
+Chart 的主要内容包括以下两大部分：
+    配置信息 (values.yaml)：这个文件包含了默认的配置参数，为运行包含在 Chart 中的应用或服务提供了一套默认值。
+    模板 (templates/)：这是一组模板文件，这些文件会用 values.yaml 中的值来生成 Kubernetes 配置文件。
+        每一个模板文件会对应生成一个 Kubernetes 对象。
+当你使用 Helm 安装一个 Chart 时，Helm 会接收你为该 Chart 提供的值（你可以在安装命令中直接提供，或者提供一个包含你的自定义值的文件），
+以及 Chart 中 values.yaml 中的默认值。
+Helm 会将这些值填充到模板中，生成最终的 Kubernetes 对象配置，再用这些配置创建 Kubernetes 对象。
+这就是 Chart 如何将 Kubernetes 资源组合在一起的。
+你可以将 Chart 想象成一个部署脚本，只不过是用于部署 Kubernetes 对象的。
+在 Kubernetes 集群中，只需要运行相应的 Helm 命令，就可以部署一个完整的应用程序或者服务。
