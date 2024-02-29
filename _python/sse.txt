@@ -1,0 +1,56 @@
+SSE（Server-Sent Events）是一种用于实现服务器向客户端单向推送数据的Web技术，允许服务器主动发送事件和数据给客户端。
+SSE插件是用于在Web应用程序中实现SSE功能的插件或库。
+
+在不同的编程语言和框架中，有各种SSE插件可供选择。以下是几个常用的SSE插件示例：
+
+    EventSource (JavaScript)：EventSource是HTML5提供的原生API，用于在客户端实现SSE功能。
+        它允许通过JavaScript与服务器建立长连接，并监听来自服务器的事件和数据。
+        使用EventSource，你可以轻松地接收服务器端推送的数据，并在客户端进行处理和更新。
+
+    Flask-SSE (Flask)：Flask-SSE是针对Flask框架的SSE插件。
+        它提供了简单的API和功能，使开发者能够在Flask应用程序中轻松地实现SSE功能。
+        Flask-SSE可以与Flask的路由系统无缝集成，允许服务器通过SSE向客户端发送事件和数据。
+
+    django-sse (Django)：django-sse是一个用于Django框架的SSE插件，用于实现SSE功能。
+        它提供了Django视图函数和模板标签，使开发者能够方便地在Django应用程序中处理SSE请求和响应。
+        django-sse还支持在Django的模型层级中定义事件和数据源。
+
+这些是仅提供一些示例的SSE插件，实际上在各种编程语言和框架中都可以找到适用于SSE的插件或库。
+当选择SSE插件时，你应该考虑其与你所使用的编程语言和框架的兼容性、功能特性以及社区支持和活跃程度。
+
+
+FastAPI是一个现代化的Web框架，提供了快速（高性能）和简单的API开发体验。
+虽然FastAPI本身并没有提供原生支持SSE（Server-Sent Events），但你可以使用其他库来实现SSE功能。
+
+在FastAPI中，你可以使用第三方库如starlette来处理SSE。
+starlette是FastAPI的底层框架，它支持异步编程和低级别的Web功能。
+以下是一个基本示例，演示了如何使用FastAPI和starlette来实现SSE：
+
+
+from fastapi import FastAPI
+from starlette.responses import Response
+
+app = FastAPI()
+
+@app.get("/sse")
+async def sse_endpoint(response: Response):
+    async def event_generator():
+        # 这是一个示例，可以根据实际需求生成事件和数据
+        yield "event: message\n"
+        yield "data: Hello, SSE!\n\n"
+
+    response.headers["Content-Type"] = "text/event-stream"
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Connection"] = "keep-alive"
+    return event_generator()
+
+在上述示例中，我们定义了一个/sse的路由，它将处理SSE请求。
+通过使用starlette提供的Response对象，我们可以设置响应的头部信息，以确保其符合SSE的规范。
+在event_generator函数中，你可以生成自定义的事件和数据，并使用yield语句发送给客户端。
+客户端会在连接建立后不断接收到这些事件和数据。
+
+需要注意的是，由于FastAPI和starlette都支持异步编程，你可以在SSE端点中使用异步操作来处理事件生成和推送。
+这使得在处理大量连接或需要长时间运行的操作时能够保持高性能和响应能力。
+
+总结而言，虽然FastAPI本身没有直接提供SSE支持，但你可以使用starlette或其他第三方库来实现SSE功能。
+这使得你可以在使用FastAPI构建的API中实现服务器向客户端的实时数据推送。

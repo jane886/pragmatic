@@ -1,0 +1,75 @@
+Go语言中常用的ORM（Object-Relational Mapping，对象关系映射）库有多种，其中3个比较流行的库包括 GORM、XORM 和 sqlx。
+以下是这些库的简短介绍：
+    GORM: 这是Go语言中最流行的ORM库之一，其API使用起来简单明了，支持多种关系型数据库（如MySQL、PostgreSQL等），
+        并且提供了丰富的特性，如事务、迁移、查询、关联、预加载等等。
+        示例：
+        go
+            import (
+            "github.com/jinzhu/gorm"
+            _ "github.com/jinzhu/gorm/dialects/postgres"
+            )
+
+            type Product struct {
+            gorm.Model
+            Code  string
+            Price uint
+            }
+
+            db, err := gorm.Open("postgres", "user=gorm dbname=gorm sslmode=disable password=gorm")
+            db.AutoMigrate(&Product{})
+            db.Create(&Product{Code: "L1212", Price: 1000})
+    XORM: 这是一个简单且强大的关系型数据库ORM库，支持MySQL、PostgreSQL、SQLite等多种数据库，提供了简单易用的API，
+        支持复杂查询、事务、缓存、表结构反向生成等等。
+        示例：
+        go
+            import "xorm.io/xorm"
+
+            type User struct {
+            Id   int64
+            Name string
+            }
+
+            engine, err := xorm.NewEngine("mysql", "root:password@/dbname?charset=utf8")
+            engine.Sync2(new(User))
+            engine.Insert(User{Name: "test"})
+    Sqlx: 这是对原生database/sql库的扩展，提供了很多便利的功能，如结构映射、命名参数等，
+        尽管它不是一个完整的ORM库，但在很多场景下可以提高代码的简洁度和易理解性。
+        示例：
+        go
+            import "github.com/jmoiron/sqlx"
+
+            type Person struct {
+            Name string `db:"name"`
+            Age  int    `db:"age"`
+            }
+
+            db, err := sqlx.Connect("postgres", "user=pqgotest dbname=pqgotest sslmode=verify-full")
+            db.MustExec("INSERT INTO person (name, age) VALUES ($1, $2)", "SomeName", 20)
+            people := []Person{}
+            db.Select(&people, "SELECT name, age FROM person")
+这些库各有特点，你可以根据实际项目需求和使用习惯选择最合适的。
+
+
+Go语言中有几个常用的ORM（对象关系映射）库，每个库都有其特点和适用场景。以下是几个流行的Go ORM库：
+
+    GORM： GORM 是一个功能强大的ORM库，提供了丰富的功能和灵活的API。
+        它支持多种数据库，如MySQL、PostgreSQL、SQLite等，并提供了高级查询、关联关系、事务管理、迁移工具等功能。
+        GORM采用链式调用的方式构建查询，具有直观的API设计和良好的文档支持。
+        它适用于大多数应用场景，并广泛应用于Go语言的项目中。
+
+    XORM： XORM 是另一个受欢迎的ORM库，具有较高的性能和可扩展性。
+        它支持多种数据库，如MySQL、PostgreSQL、SQLite、Oracle等，并提供了基本的CRUD操作、事务管理、高级查询等功能。
+        XORM在性能方面表现出色，可以处理大量的数据和高并发的场景。
+        它还提供了丰富的映射设置和灵活的钩子函数机制，使开发人员能够对ORM行为进行细粒度的控制。
+
+    Gorp： Gorp 是一个简单而轻量级的ORM库，适用于小型项目或简单的数据库操作。
+        它支持多种数据库，如MySQL、PostgreSQL、SQLite等，并提供了基本的CRUD操作、事务管理和简单的查询功能。
+        Gorp的设计目标是简单易用，它提供了简洁的API和注解方式来映射数据库表和结构体。
+        如果项目规模较小或需要快速上手的情况下，Gorp是一个不错的选择。
+
+    QBS： QBS 是一个轻量级的ORM库，专注于简洁性和易用性。
+        它支持多种数据库，如MySQL、PostgreSQL、SQLite等，并提供了基本的CRUD操作、事务管理和简单的查询功能。
+        QBS的设计理念是尽可能地保持代码的简洁和可读性，它提供了直观的API和结构体标签来进行数据库映射。
+        如果你喜欢简单且直观的ORM库，QBS可能是一个不错的选择。
+
+这些ORM库都有其独特的特点和适用场景，选择合适的ORM库取决于项目的规模、性能需求、开发团队的经验和个人偏好等因素。建议在选择之前仔细评估每个库的功能和文档，并根据项目的需求进行测试和比较。
