@@ -1,3 +1,19 @@
+Kubernetes（k8s）的基本工作原理是通过控制平面和工作负载节点来管理容器化应用程序。
+控制平面包括kube-apiserver、etcd、kube-scheduler和kube-controller-manager等组件，负责管理集群状态和配置信息。
+其中，kube-apiserver提供Kubernetes API，
+    etcd是分布式键值存储用于存储集群数据，
+    kube-scheduler负责在可用工作节点上调度Pod，
+    kube-controller-manager监控对象状态并确保与期望状态一致。
+工作负载节点运行应用程序的容器，由kubelet代理与控制平面通信，并通过容器运行时（如Docker）管理容器的生命周期。
+整体而言，Kubernetes通过这些组件协同工作，实现容器化应用程序的部署、扩展、管理和维护。
+
+Kubernetes集群的基本架构包括Master节点和Node节点。
+Master节点是Kubernetes的大脑，运行着核心组件，如kube-apiserver、kube-scheduler、kube-controller-manager、etcd和Pod网络。
+Master节点负责管理整个集群的状态和配置，提供API接口供外部访问，并安排部署和管理整个集群。
+每个Node节点运行一个运行时容器（如Docker或rkt）和与主机通信的代理，同时运行用于日志记录、监视、服务发现和其他组件。
+Node节点向应用程序公开计算、网络和存储资源，可以是在云中运行的虚拟机或在数据中心内运行的裸机服务器。
+整体而言，Kubernetes集群的基本架构由Master节点和Node节点组成，通过这些组件协同工作实现容器化应用程序的部署、管理和维护。
+
 Kubernetes（常简称为 K8s）是一个开源的、用于自动部署、伸缩和管理容器化应用的平台。它的基本工作原理如下：
     主节点（Master Node）与工作节点（Worker Node）：K8s 集群有两种主要类型节点，主节点负责管理和控制集群，而工作节点则运行实际的应用程序。
     API Server：位于主节点的 Kubernetes API 服务器是 Kubernetes 控制面的前端，所有的管理操作都是通过 API 服务器进行。
