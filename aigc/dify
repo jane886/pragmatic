@@ -1,0 +1,62 @@
+Dify 是一个 LLM 应用开发平台，已经有超过 10 万个应用基于 Dify.AI 构建。
+它融合了 Backend as Service 和 LLMOps 的理念，涵盖了构建生成式 AI 原生应用所需的核心技术栈，包括一个内置 RAG 引擎。
+使用 Dify，你可以基于任何模型自部署类似 Assistants API 和 GPTs 的能力。
+
+
+Dify 是一款开源的大语言模型(LLM) 应用开发平台。
+它融合了后端即服务（Backend as Service）和 LLMOps 的理念，使开发者可以快速搭建生产级的生成式 AI 应用。
+即使你是非技术人员，也能参与到 AI 应用的定义和数据运营过程中。
+
+由于 Dify 内置了构建 LLM 应用所需的关键技术栈，包括对数百个模型的支持、直观的 Prompt 编排界面、高质量的 RAG 引擎以及灵活的 Agent 框架，
+并同时提供了一套易用的界面和 API。这为开发者节省了许多重复造轮子的时间，使其可以专注在创新和业务需求上。
+
+为什么使用 Dify？
+    你或许可以把 LangChain 这类的开发库（Library）想象为有着锤子、钉子的工具箱。
+    与之相比，Dify 提供了更接近生产需要的完整方案，Dify 好比是一套脚手架，并且经过了精良的工程设计和软件测试。
+
+重要的是，Dify 是开源的，它由一个专业的全职团队和社区共同打造。
+你可以基于任何模型自部署类似 Assistants API 和 GPTs 的能力，在灵活的安全的基础上，同时保持对数据的完全控制。
+
+
+Dify 能做什么？
+    Dify 一词源自 Define + Modify，意指定义并且持续的改进你的 AI 应用，它是为你而做的（Do it for you）。
+
+    创业，
+        快速的将你的 AI 应用创意变成现实，无论成功和失败都需要加速。
+        在真实世界，已经有几十个团队通过 Dify 构建 MVP（最小可用产品）获得投资，或通过 POC（概念验证）赢得了客户的订单。
+
+    将 LLM 集成至已有业务，
+        通过引入 LLM 增强现有应用的能力，接入 Dify 的 RESTful API 从而实现 Prompt 与业务代码的解耦，
+        在 Dify 的管理界面是跟踪数据、成本和用量，持续改进应用效果。
+
+    作为企业级 LLM 基础设施，
+        一些银行和大型互联网公司正在将 Dify 部署为企业内的 LLM 网关，加速 GenAI 技术在企业内的推广，并实现中心化的监管。
+
+    探索 LLM 的能力边界，
+        即使你是一个技术爱好者，通过 Dify 也可以轻松的实践 Prompt 工程和 Agent 技术，
+        在 GPTs 推出以前就已经有超过 60,000 开发者在 Dify 上创建了自己的第一个应用。
+
+
+为什么选择 Dify
+Dify 具有模型中立性，相较 LangChain 等硬编码开发库 Dify 是一个完整的、工程化的技术栈，而相较于 OpenAI 的 Assistants API 你可以完全将服务部署在本地。
+
+功能	Dify.AI	Assistants API	LangChain
+编程方式	面向 API	面向 API	面向 Python 代码
+生态策略	开源	封闭且商用	       开源
+RAG 引擎	支持	支持	        不支持
+Prompt IDE	包含	包含	        没有
+支持的 LLMs	丰富	仅 GPT	        丰富
+本地部署	支持	不支持	        不适用
+
+
+特点：
+1. LLM支持：与 OpenAI 的 GPT 系列模型集成,或者与开源的 Llama2 系列模型集成。事实上，Dify支持主流的商业模型和开源模型(本地部署或基于 MaaS)。
+
+2. Prompt IDE：和团队一起在 Dify 协作，通过可视化的 Prompt 和应用编排工具开发 AI 应用。 支持无缝切换多种大型语言模型。
+
+3. RAG引擎：包括各种基于全文索引或向量数据库嵌入的 RAG 能力，允许直接上传 PDF、TXT 等各种文本格式。
+
+4. AI Agent：基于 Function Calling 和 ReAct 的 Agent 推理框架，允许用户自定义工具，所见即所得。Dify 提供了十多种内置工具调用能力，如谷歌搜索、DELL·E、Stable Diffusion、WolframAlpha 等。
+
+5. 持续运营：监控和分析应用日志和性能，使用生产数据持续改进 Prompt、数据集或模型。
+
