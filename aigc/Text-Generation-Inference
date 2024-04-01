@@ -1,0 +1,21 @@
+Text Generation Inference（TGI）是HuggingFace推出的大模型推理部署框架，支持主流大模型和主流大模型量化方案，
+相对其他大模型推理框架框架TGI的特色是联用Rust和Python达到服务效率和业务灵活性的平衡。
+
+组件	编写语言和功能
+Router	Rust编写的一个中间层，
+        对外提供网络服务（如接收返回请求、并发过高时排队等），对内将用户的请求整合并转发推理服务（即下文的Server），
+        并实时估算资源（如显存）剩余量能否满足请求，避免过载导致的服务崩溃。
+Server	Python编写的推理服务。
+        TGI底层推理引擎以Pytorch算子为主，以提供Pytorch接口封装的第三方算子（FlashAttention、PagedAttenion等）为辅。
+        Server是模型加载、推理、解码（后处理）以及Continuous Batching的具体实现，
+        由从Router发送的gPRC信息驱动并进行相应的动作（下文具体说明
+Client	Python编写的客户端，支持异步。
+        用户需要通过携带JSON数据的HTTP协议与TGI交互，Client可替代用户完成协议的封装、解析、错误处理的繁琐操作，
+        同时也可作为客户端开发的参考。
+Launcher	Rust编写，核心功能与torch.distributed.launch类似，即按照模型切分参数创建若干个Server子进程，
+            并通过传递RANK等参数建立Server子进程之间的分布式通信。
+            同时还负责校验建立服务参数（最大输入长度、量化方法等），并将这些参数传递给Server子进程用于初始化。
+Benchmark	Rust编写的Bechmark，可以很方便地指定大模型推理时的BatchSize、输入长度、输出长度等，
+            可以克服语言模型在实际使用时输出长度不固定，不利于定量分析性能的问题。
+
+其中，Router和Server是最重要的组件，TGI提供服务的业务逻辑将围绕两者展开。
