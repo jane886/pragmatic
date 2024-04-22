@@ -31,30 +31,31 @@ from utils import ensure
 
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
-        # 1. 定义左右指针
-        # 2. 定义最大长度
-        # 3. 定义最大字符串
-        # 4. 定义字符集合
-        # 5. 遍历字符串
-        # 6. 如果当前字符不在字符集合中，则将当前字符加入字符集合，右指针右移
-        # 7. 如果当前字符在字符集合中，则将左指针右移，直到当前字符不在字符集合中
-        # 8. 如果当前字符不在字符集合中，则将当前字符加入字符集合，右指针右移
-        # 9. 如果当前字符在字符集合中，则将左指针右移，直到当前字符不在字符集合中
-        # 10. 重复 6-9
-        # 11. 返回最大长度
-        left = right = 0
-        max_len = 0
-        char_set = set()
-        while right < len(s):
-            if s[right] not in char_set:
-                char_set.add(s[right])
-                right += 1
-                if right - left > max_len:
-                    max_len = right - left
-            else:
-                char_set.remove(s[left])
-                left += 1
-        return max_len
+        # 哈希集合，记录每个字符是否出现过
+        occ = set()
+        n = len(s)
+        # 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动
+        rk, ans = -1, 0
+        for i in range(n):
+            if i != 0:
+                # 左指针向右移动一格，移除一个字符
+                occ.remove(s[i - 1])
+            while rk + 1 < n and s[rk + 1] not in occ:
+                # 不断地移动右指针
+                occ.add(s[rk + 1])
+                rk += 1
+            # 第 i 到 rk 个字符是一个极长的无重复字符子串
+            ans = max(ans, rk - i + 1)
+        return ans
+
+
+# 复杂度分析
+
+    # 时间复杂度：O(N)，其中 NNN 是字符串的长度。左指针和右指针分别会遍历整个字符串一次。
+
+    # 空间复杂度：O(∣Σ∣)，其中 Σ 表示字符集（即字符串中可以出现的字符），∣Σ∣ 表示字符集的大小。
+        # 在本题中没有明确说明字符集，因此可以默认为所有 ASCII 码在 [0,128) 内的字符，即 ∣Σ∣=128|。
+        # 我们需要用到哈希集合来存储出现过的字符，而字符最多有 ∣Σ∣个，因此空间复杂度为 O(∣Σ∣)。
 
 
 class Test:

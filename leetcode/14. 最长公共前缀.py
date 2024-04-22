@@ -29,28 +29,32 @@ from utils import ensure
 
 
 class Solution:
+    # 横向扫描
     def longestCommonPrefix(self, strs: List[str]) -> str:
-        if len(strs) == 0:
-            return ''
-
-        current = strs[0]
-        for s in strs[1:]:
-            current = self.compare(current, s)
-
-        return current
-
-    @staticmethod
-    def compare(s1, s2):
-        if len(s1) > len(s2):
-            s1, s2 = s2, s1
-
-        s = ''
-        for i, c in enumerate(s1):
-            if c == s2[i]:
-                s += c
-            else:
+        if not strs:
+            return ""
+        
+        prefix, count = strs[0], len(strs)
+        for i in range(1, count):
+            prefix = self.lcp(prefix, strs[i])
+            if not prefix:
                 break
-        return s
+        
+        return prefix
+
+    def lcp(self, str1, str2):
+        length, index = min(len(str1), len(str2)), 0
+        while index < length and str1[index] == str2[index]:
+            index += 1
+        return str1[:index]
+
+
+# 复杂度分析
+
+    # 时间复杂度：O(mn)，其中 m 是字符串数组中的字符串的平均长度，n 是字符串的数量。
+        # 最坏情况下，字符串数组中的每个字符串的每个字符都会被比较一次。
+
+    # 空间复杂度：O(1)。使用的额外空间复杂度为常数。
 
 
 class Test:

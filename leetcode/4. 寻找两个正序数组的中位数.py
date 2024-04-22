@@ -34,43 +34,55 @@ from utils import ensure
 
 
 class Solution:
+    # 二分查找
     def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
-        # 确定较短数组为 nums1
-        if len(nums1) > len(nums2):
-            nums1, nums2 = nums2, nums1
+        def getKthElement(k):
+            """
+            - 主要思路：要找到第 k (k>1) 小的元素，那么就取 pivot1 = nums1[k/2-1] 和 pivot2 = nums2[k/2-1] 进行比较
+            - 这里的 "/" 表示整除
+            - nums1 中小于等于 pivot1 的元素有 nums1[0 .. k/2-2] 共计 k/2-1 个
+            - nums2 中小于等于 pivot2 的元素有 nums2[0 .. k/2-2] 共计 k/2-1 个
+            - 取 pivot = min(pivot1, pivot2)，两个数组中小于等于 pivot 的元素共计不会超过 (k/2-1) + (k/2-1) <= k-2 个
+            - 这样 pivot 本身最大也只能是第 k-1 小的元素
+            - 如果 pivot = pivot1，那么 nums1[0 .. k/2-1] 都不可能是第 k 小的元素。把这些元素全部 "删除"，剩下的作为新的 nums1 数组
+            - 如果 pivot = pivot2，那么 nums2[0 .. k/2-1] 都不可能是第 k 小的元素。把这些元素全部 "删除"，剩下的作为新的 nums2 数组
+            - 由于我们 "删除" 了一些元素（这些元素都比第 k 小的元素要小），因此需要修改 k 的值，减去删除的数的个数
+            """
+            
+            index1, index2 = 0, 0
+            while True:
+                # 特殊情况
+                if index1 == m:
+                    return nums2[index2 + k - 1]
+                if index2 == n:
+                    return nums1[index1 + k - 1]
+                if k == 1:
+                    return min(nums1[index1], nums2[index2])
 
-        m, n = len(nums1), len(nums2)  # 两个数组的长度
-        left, right = 0, m  # 二分上下界，初始为整个 nums1 的范围
-
-        while left <= right:
-            i = (left + right) // 2  # nums1 分界线位置
-            j = (m + n + 1) // 2 - i  # nums2 分界线位置
-
-            # 找到 nums1 的右半部分的最小值和 nums2 的左半部分的最大值
-            nums1_right_min = float('inf') if i == m else nums1[i]
-            nums2_left_max = float('-inf') if j == 0 else nums2[j - 1]
-
-            # 找到 nums1 的左半部分的最大值和 nums2 的右半部分的最小值
-            nums1_left_max = float('-inf') if i == 0 else nums1[i - 1]
-            nums2_right_min = float('inf') if j == n else nums2[j]
-
-            # 满足条件：左半部分的所有数都小于右半部分的所有数
-            if nums1_left_max <= nums2_right_min and nums2_left_max <= nums1_right_min:
-                # 判断总元素个数的奇偶性，确定中位数
-                if (m + n) % 2 == 0:
-                    return (max(nums1_left_max, nums2_left_max) + min(nums1_right_min, nums2_right_min)) / 2.0
+                # 正常情况
+                newIndex1 = min(index1 + k // 2 - 1, m - 1)
+                newIndex2 = min(index2 + k // 2 - 1, n - 1)
+                pivot1, pivot2 = nums1[newIndex1], nums2[newIndex2]
+                if pivot1 <= pivot2:
+                    k -= newIndex1 - index1 + 1
+                    index1 = newIndex1 + 1
                 else:
-                    return max(nums1_left_max, nums2_left_max)
+                    k -= newIndex2 - index2 + 1
+                    index2 = newIndex2 + 1
+        
+        m, n = len(nums1), len(nums2)
+        totalLength = m + n
+        if totalLength % 2 == 1:
+            return getKthElement((totalLength + 1) // 2)
+        else:
+            return (getKthElement(totalLength // 2) + getKthElement(totalLength // 2 + 1)) / 2
 
-            # 如果 nums1 的右半部分的最小值大于 nums2 的左半部分的最大值
-            # 分界线需要左移
-            elif nums1_right_min > nums2_left_max:
-                right = i - 1
 
-            # 如果 nums2 的右半部分的最小值大于 nums1 的左半部分的最大值
-            # 分界线需要右移
-            else:
-                left = i + 1
+# 复杂度分析
+    # 时间复杂度：O(log⁡(m+n))，其中 m 和 n 分别是数组 nums1 和 nums2 的长度。
+        # 初始时有 k=(m+n)/2 或 k=(m+n)/2+1，每一轮循环可以将查找范围减少一半，因此时间复杂度是 O(log⁡(m+n))
+
+    # 空间复杂度：O(1)O(1)O(1)。
 
 
 class Test:

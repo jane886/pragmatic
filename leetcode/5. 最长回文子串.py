@@ -29,6 +29,7 @@ def log(*args):
 
 
 class Solution:
+    # 中心扩展算法
     def longestPalindrome(self, s: str) -> str:
         # 中心扩散法 这个思路最方便理解
         # 假设字符串长度超过3，则从第二个字符开始，往左右两边遍历，两两比较，直到遇到不同
@@ -52,6 +53,12 @@ class Solution:
             left -= 1
             right += 1
         return left + 1, right - 1
+
+
+# 复杂度分析
+
+    # 时间复杂度：O(n2)，其中 n 是字符串的长度。长度为 1 和 2 的回文中心分别有 n 和 n−1 个，每个回文中心最多会向外扩展 O(n) 次。
+    # 空间复杂度：O(1)O(1)O(1)。
 
 
 class Test:
