@@ -24,11 +24,8 @@ class Solution:
             curr = next_node
         return pre
         
+# 复杂度分析
 
+    # 时间复杂度：O(n)，其中 n 是链表的长度。需要遍历链表一次。
 
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
+    # 空间复杂度：O(1)。
