@@ -1,0 +1,30 @@
+Redis 是一种常用的内存数据库，它提供了多种内存淘汰机制来管理内存使用情况。
+内存淘汰机制用于在内存不足时，根据一定的策略选择需要被淘汰的数据，以便为新的数据腾出空间。
+以下是 Redis 中常见的内存淘汰机制：
+
+    LRU（Least Recently Used）：最近最少使用。Redis根据数据的最近使用情况，淘汰最近最少被访问的数据。
+
+    LFU（Least Frequently Used）：最不经常使用。Redis根据数据的访问频率，淘汰最不经常被访问的数据。
+
+    Random：随机淘汰。Redis随机选择需要被淘汰的数据。
+
+    TTL（Time-To-Live）：设置过期时间。Redis为每个键设置过期时间，当键过期时，自动淘汰。
+
+
+在 Redis 中，可以通过配置文件或在运行时使用命令来设置内存淘汰机制。以下是一些相关的配置选项：
+    maxmemory：设置 Redis 实例可用的最大内存量。
+    maxmemory-policy：设置用于内存淘汰的策略，如LRU、LFU、Random等。
+    maxmemory-samples：设置用于采样的键的数量，用于确定要淘汰的键。
+
+
+以下是一些示例配置：
+    Copy
+    # 设置 Redis 最大内存为1GB
+    maxmemory 1gb
+    # 使用 LRU 策略进行内存淘汰
+    maxmemory-policy allkeys-lru
+    # 设置采样键的数量为5
+    maxmemory-samples 5
+
+需要注意的是，内存淘汰机制是一个权衡性能和数据保留的过程。
+选择适合你的应用场景的淘汰策略很重要，以确保在内存不足时，淘汰出的数据对应用的影响最小化。

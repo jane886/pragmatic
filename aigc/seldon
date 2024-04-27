@@ -1,3 +1,27 @@
+根据提供的资料,使用Seldon部署大模型的主要优缺点如下:
+    优点:
+    统一的部署方式:
+        Seldon Core提供了一套相对统一的部署方式,支持不同机器学习框架(TensorFlow、PyTorch等)训练的模型。
+        这简化了不同框架下模型的部署过程。
+    支持复杂的推理图:
+        Seldon Core支持构建有向无环的推理图,可以实现模型的解释、异常检测、特征转换等复杂的推理流程。
+        这对于部署大型模型pipeline很有帮助。
+    与Kubernetes集成良好:
+        Seldon Core基于Kubernetes,可以很好地与Kubernetes集成,利用Kubernetes的扩展性和高可用性。
+        这使得Seldon Core能够支持大规模模型部署和管理。
+    
+    缺点:
+    依赖Kuberne tes:
+        Seldon Core强依赖Kubernetes,如果您不使用Kubernetes,Seldon Core可能不是最佳选择。
+    复杂性:
+        尽管Seldon Core提供了统一的部署方式,但对于新手来说,学习和配置Seldon Core可能会有一定难度。
+    性能:
+        对于一些对延迟要求很高的实时应用,Seldon Core的性能可能不如一些专门针对模型推理优化的工具,
+        如TensorFlow Serving。
+总的来说,Seldon Core在部署大型模型方面提供了很好的支持,特别是对于需要复杂推理流程的场景。
+但它也存在一定的局限性,需要根据具体需求进行权衡。
+
+
 Seldon Core：速度极快、行业就绪的机器学习
 
 1，一个开源平台，用于在 Kubernetes 上大规模部署机器学习模型。
