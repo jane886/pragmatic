@@ -1,0 +1,64 @@
+在Go语言中，new和make是两个用于创建值的内建函数，它们有不同的用途和适用场景。
+
+new：new函数用于创建指向某种类型的指针，并返回该指针。
+    它的语法为new(Type)，其中Type表示某种类型。
+    new函数会分配内存空间来存储该类型的零值，并返回一个指针指向该内存空间。
+    ```
+    package main
+
+    import "fmt"
+
+    func main() {
+        // 创建一个指向整型的指针
+        p := new(int)
+        fmt.Println(*p) // 输出：0，指向的整型零值
+
+        // 创建一个指向结构体的指针
+        type Person struct {
+            Name string
+            Age  int
+        }
+        p2 := new(Person)
+        fmt.Println(*p2) // 输出：{"" 0}，指向的结构体零值
+    }
+    ```
+    new函数主要用于创建值的指针，特别是在需要将指针作为参数传递给函数或方法时很有用。注意，new函数分配的内存空间被初始化为对应类型的零值。
+
+make：make函数用于创建内置引用类型的值，例如切片（slice）、映射（map）和通道（channel）。
+    它的语法根据具体的引用类型有所不同。make函数会分配内存并初始化对应类型的值，并返回该值。
+    ```
+    package main
+
+    import "fmt"
+
+    func main() {
+        // 创建一个切片
+        s := make([]int, 3, 5)
+        fmt.Println(s)      // 输出：[0 0 0]
+        fmt.Println(len(s)) // 输出：3
+        fmt.Println(cap(s)) // 输出：5
+
+        // 创建一个映射
+        m := make(map[string]int)
+        m["a"] = 1
+        m["b"] = 2
+        fmt.Println(m)      // 输出：map[a:1 b:2]
+
+        // 创建一个通道
+        c := make(chan int)
+        fmt.Println(c) // 输出：0xc000016060
+    }
+    ```
+    make函数用于创建切片、映射和通道等引用类型的值。它会分配内存并初始化对应类型的值，返回该值。
+    注意，make函数返回的是引用类型的值本身，而不是指针。
+
+总结：
+new用于创建值的指针，返回该指针。
+make用于创建引用类型的值（切片、映射、通道等），返回该值本身。
+需要根据具体的需求和数据类型来选择使用new还是make。
+
+
+
+
+
+
