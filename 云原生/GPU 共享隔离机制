@@ -1,0 +1,93 @@
+Orca 采用的是 TKE 的 GPU 共享隔离机制方案，
+该方案通过将一个物理 GPU 卡划分为多个 虚拟的 GPU，支持显存和计算资源两个维度的按需分配给容器。
+在 K8S 层面既做调度，又 做到隔离两个方面的共享。
+
+为了在容器中有效地共享 GPU 资源，实现对 K8S 透明，不对 K8S 及用户应用做入侵，
+同时确保性能和隔离，TKE GPU 共享方案借鉴 cgroup 的设计思想，像 cgroup 管理 CPU 和内存一样来管理 GPU 和显存，
+同时通过 device-plugin，来做 GPU 资源的发现、为任务分 配相应的硬件资源，以及配置容器运行时环境，提出了 vCUDA 的设计:
+    vCUDA 的系统架构与 Nvidia Grid 架构类似，采用一个 manager 来管理 GPU， 
+    manager 负责配置容器的 GPU 计算能力和显存资源，做到使用者无法使用多于申请的显存，GPU 的平均使用率不会大幅超出申请值。
+    vCUDA的设计采用零入侵设计，用户的程序无需重新编译就可以运行在GaiaStack平台进行GPU共享。
+    vCUDA 使用修改后 cuda library 来达到资源控制，vCUDA 分别修改了计算操作，显存操作 和 信息获取 3 个方面的 API
+
+该方案其主要包括 4 个核心组件:
+    GPU-Manager:是一个 device-plugin，它运行在主机层，主要负责创建 vGPU 和通 过 gRPC 和 kubelet 进行通信，
+        向 kubelet 汇报其管理的 GPU 资源 
+    GPU-Scheduler:在主机层，主要负责为 vGPU 分配物理 GPU 资源，为 GPU- Manager 发出的调度请求服务。
+        其采用基于 GPU 拓扑树的分配策略进行资源的分配， 其目标是最小化 GPU 拓扑树碎片，以及最小化 GPU 间通信代价。
+        GPU 拓扑树的根节 点是一个物理主机，叶子节点是一块物理 GPU。 
+    vGPU-Manager:在主机层，主要提供容器配置以及监控分配了 vGPU 的容器。 
+    vGPU-Library:在容器层，主要负责管理具体容器的 GPU 资源。
+
+
+背景
+    目前 TKE 已提供基于 qGPU 的算力/显存强隔离的共享 GPU 调度隔离方案，但是部分用户反馈缺乏 GPU 资源的可观测性，
+    例如无法获取单个 GPU 设备的剩余资源，不利于 GPU 资源的运维和管理。
+    在这种背景下，我们希望提供一种方案，可以让用户在 Kubernetes 集群中直观的统计和查询 GPU 资源的使用情况。
+
+目标
+    在目前 TKE 共享 GPU 调度方案的基础上，从以下几个方面增强 GPU 设备的可观测性：
+        支持获取单个 GPU 设备的资源分配信息。
+        支持获取单个 GPU 设备的健康状态。
+        支持获取某个节点上各 GPU 设备信息。
+        支持获取 GPU 设备和 Pod / Container 关联信息。
+
+我们的方案
+    我们通过 GPU CRD 扫描物理 GPU 的信息，并在 qGPU 生命周期中更新使用到的物理 GPU 资源，从而解决在共享 GPU 场景下缺少可见性的问题。
+        自定义 GPU CRD：每个 GPU 设备对应一个 GPU 对象，通过 GPU 对象可以获取 GPU 设备的硬件信息，健康状态以及资源分配情况。
+        Elastic GPU Device Plugin：根据 GPU 设备的硬件信息创建 GPU 对象，定期更新 GPU 设备的健康状态。
+        Elastic GPU Scheduler：根据 GPU 资源使用情况调度 Pod，同时将调度结果更新到 GPU 对象。
+
+    每个 GPU 物理卡对应一个 GPU CRD，通过 GPU CRD 可以清楚了解每张卡的型号，显存等硬件信息，
+    同时通过 status 可以获取每个 GPU 设备的健康状态和资源分配情况。
+
+TKE GPU 调度过程
+    Kubernetes 提供了 Scheduler Extender 用于对调度器进行扩展，用于满足复杂场景下的调度需求。
+    扩展后的调度器会在调用内置预选策略和优选策略之后通过 HTTP 协议调用扩展程序再次进行预选和优选，
+    最后选择一个合适的 Node 进行 Pod 的调度。
+
+    在 TKE Elastic GPU Scheduler（原 TKE qGPU Scheduler），我们结合了 GPU CRD 设计，
+    在调度时首先会根据 status.state 过滤掉异常 GPU 设备，然后根据 status.allocatable 选择剩余资源满足需求的 GPU 设备，
+    在最终完成调度时更新 status.allocatable 和 status.allocated 。
+
+TKE GPU 分配过程
+    Kubernetes 提供了 Device Plugin 机制用于支持 GPU FPGA 等硬件设备，
+    设备厂商只需要根据接口实现 Device Plugin 而不需要修改 Kubernetes 源码，Device Plugin 一般以 DaemonSet 的形式运行在节点上。
+
+    我们在 TKE Elastic GPU Device Plugin（原 TKE qGPU Device Plugin）启动时会根据节点上 GPU 设备的硬件信息创建 GPU 对象，
+    同时会定期检查 GPU 设备的健康状态并同步到 GPU 对象的 status.state。
+
+总结
+为了解决目前 TKE 集群内 GPU 资源可观测性缺失的问题，我们引入了 GPU CRD，用户可以直观的统计和查询集群内 GPU 资源的使用情况，
+目前这套方案已和 qGPU 完成整合，在 TKE 控制台安装 qGPU 插件时选择使用 CRD 即可开启。
+
+apiVersion: elasticgpu.io/v1alpha1
+kind: GPU
+metadata:
+  labels:
+    elasticgpu.io/node: 10.0.0.2
+  name: 192.168.2.5-00
+spec:
+  index: 0
+  memory: 34089730048
+  model: Tesla V100-SXM2-32GB
+  nodeName: 10.0.0.2
+  path: /dev/nvidia0
+  uuid: GPU-cf0f5fe7-0e15-4915-be3c-a6d976d65ad4
+status:
+  state: Healthy
+  allocatable:
+    tke.cloud.tencent.com/qgpu-core: "50"
+    tke.cloud.tencent.com/qgpu-memory: "23"
+  allocated:
+    0dc3c905-2955-4346-b74e-7e65e29368d2:
+      containers:
+      - container: test
+        resource:
+          tke.cloud.tencent.com/qgpu-core: "50"
+          tke.cloud.tencent.com/qgpu-memory: "8"
+      namespace: default
+      pod: test
+  capacity:
+    tke.cloud.tencent.com/qgpu-core: "100"
+    tke.cloud.tencent.com/qgpu-memory: "31"
