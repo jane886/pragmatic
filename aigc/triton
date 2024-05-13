@@ -6,4 +6,17 @@ Triton Inference Server 是一款开源推理服务软件，可简化 AI 推理�
  Triton 推理服务器为许多查询类型提供优化的性能，包括实时、批量、集成和音频/视频流。 
  Triton 推理服务器是 NVIDIA AI Enterprise 的一部分，NVIDIA AI Enterprise 是一个软件平台，可加速数据科学管道并简化生产型 AI 的开发和部署。
 
+triton 是一个开源框架，是 NVIDIA 推出的，主要针对的就是更加高效、更加简洁的进行推理 serving 服务
+    triton 可以 serving 多种不同框架的模型的，比如说 TensorFlow、pytorch、tensorRT、XGBoost、onnx 等等
+    这些模型都是可以通过 triton 来部署的
+    
+    之后是它可以接收各种各样的请求类型，比方说 real time 的请求、批处理的请求、流处理的请求，都是可以的
+    之后就是 triton 支持多种多样的平台的，无论是 CPU、GPU，操作系统也是 Linux、Windows 甚至是 virtualization(虚拟机) 都是可以的
+    以及云端、边缘端（主要指 jetson 设备），都是可以通过 triton 来进行模型部署的
 
+    之后就是 triton 本身可以是很好的跟一些 DevOps 以及 MLOps 的这些工具和生态进行结合的
+    它可以很好的跟 k8s、KServe、普罗米修斯 Prometheus 以及 Grafana 来进行结合从而实现一个大规模的部署
+
+    最后就是也是最重要的一点就是使用 triton 我们可以去提升整体的一个 serving 的性能，并且提高 GPU 的利用率
+    那么在 triton 当中呢我们通过 Model Analyzer（模型分析仪）、optimal model configuration（最优模型配置最优模型配置）等策略来提升在线推理的性能，
+    可以提供更高的吞吐量同时呢充分的去利用 GPU 以及 CPU 的资源
