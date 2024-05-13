@@ -1,0 +1,113 @@
+vllm
+    vLLM是一个开源的大模型推理加速框架，通过PagedAttention高效地管理attention中缓存的张量，
+    实现了比HuggingFace Transformers高14-24倍的吞吐量。
+    PagedAttention 是 vLLM 的核心技术，它解决了LLM服务中内存的瓶颈问题。
+    传统的注意力算法在自回归解码过程中，需要将所有输入Token的注意力键和值张量存储在GPU内存中，以生成下一个Token。
+    这些缓存的键和值张量通常被称为KV缓存。
+主要特性
+    通过PagedAttention对 KV Cache 的有效管理
+    传入请求的continus batching，而不是static batching
+    支持张量并行推理
+    支持流式输出
+    兼容 OpenAI 的接口服务
+    与 HuggingFace 模型无缝集成
+与其他框架（HF、TGI）的性能对比
+    vLLM 的吞吐量比 HF 高 14 - 24 倍，比 TGI 高 2.2 - 2.5 倍。
+业界案例
+    vLLM 已经被用于 Chatbot Arena 和 Vicuna 大模型的服务后端。
+
+
+HuggingFace TGI
+    Text Generation Inference（TGI）是 HuggingFace 推出的一个项目，
+    作为支持 HuggingFace Inference API 和 Hugging Chat 上的LLM 推理的工具，旨在支持大型语言模型的优化推理。
+主要特性
+    支持张量并行推理
+    支持传入请求 Continuous batching 以提高总吞吐量
+    使用 flash-attention 和 Paged Attention 在主流的模型架构上优化用于推理的 transformers 代码。注意：并非所有模型都内置了对这些优化的支持。
+    使用bitsandbytes(LLM.int8())和GPT-Q进行量化
+    内置服务评估，可以监控服务器负载并深入了解其性能
+    轻松运行自己的模型或使用任何 HuggingFace 仓库的模型
+    自定义提示生成：通过提供自定义提示来指导模型的输出，轻松生成文本
+    使用 Open Telemetry，Prometheus 指标进行分布式跟踪
+适用场景
+    依赖 HuggingFace 模型，并且不需要为核心模型增加多个adapter的场景。
+
+
+FasterTransformer
+    NVIDIA FasterTransformer (FT) 是一个用于实现基于Transformer的神经网络推理的加速引擎。
+    它包含Transformer块的高度优化版本的实现，其中包含编码器和解码器部分。
+    使用此模块，您可以运行编码器-解码器架构模型（如：T5）、仅编码器架构模型（如：BERT）和仅解码器架构模型（如： GPT）的推理。
+    
+    FT框架是用C++/CUDA编写的，依赖于高度优化的 cuBLAS、cuBLASLt 和 cuSPARSELt 库，这使您可以在 GPU 上进行快速的 Transformer 推理。
+    与 NVIDIA TensorRT 等其他编译器相比，FT 的最大特点是它支持以分布式方式进行 Transformer 大模型推理。
+FasterTransformer 中的优化技术
+    与深度学习训练的通用框架相比，FT 使您能够获得更快的推理流水线以及基于 Transformer 的神经网络具有更低的延迟和更高的吞吐量。 
+    FT 对 GPT-3 和其他大型 Transformer 模型进行的一些优化技术包括：
+    层融合（Layer fusion）
+        这是预处理阶段的一组技术，将多层神经网络组合成一个单一的神经网络，将使用一个单一的核（kernel）进行计算。 
+        这种技术减少了数据传输并增加了数学密度，从而加速了推理阶段的计算。
+         例如， multi-head attention 块中的所有操作都可以合并到一个核（kernel）中。
+    自回归模型的推理优化(激活缓存)
+        为了防止通过Transformer重新计算每个新 token 生成器的先前的key和value，FT 分配了一个缓冲区来在每一步存储它们。
+        虽然需要一些额外的内存使用，但 FT 可以节省重新计算的成本。该过程如下图所示，相同的缓存机制用于 NN 的多个部分。
+    内存优化
+        与 BERT 等传统模型不同，大型 Transformer 模型具有多达数万亿个参数，占用数百 GB 存储空间。
+        即使我们以半精度存储模型，GPT-3 175b 也需要 350 GB。因此有必要减少其他部分的内存使用。
+        例如，在 FasterTransformer 中，我们在不同的解码器层重用了激活/输出的内存缓冲（buffer）。
+        由于 GPT-3 中的层数为 96，因此我们只需要 1/96 的内存量用于激活。
+    使用 MPI 和 NCCL 实现节点间/节点内通信并支持模型并行
+        FasterTransormer 同时提供张量并行和流水线并行。 对于张量并行，FasterTransformer 遵循了 Megatron 的思想。 
+        对于自注意力块和前馈网络块，FT 按行拆分第一个矩阵的权重，并按列拆分第二个矩阵的权重。 
+        通过优化，FT 可以将每个 Transformer 块的归约（reduction）操作减少到两次。
+        对于流水线并行，FasterTransformer 将整批请求拆分为多个微批，隐藏了通信的空泡（bubble）。 
+        FasterTransformer 会针对不同情况自动调整微批量大小。
+与其他框架（PyTorch）的性能对比
+    FT 适用于计算能力 >= 7.0 的 GPU，例如: V100、A10、A100 等。
+存在的问题
+    英伟达新推出了TensorRT-LLM，相对来说更加易用，后续FasterTransformer将不再为维护了。
+
+
+DeepSpeed-MII
+    DeepSpeed-MII 是 DeepSpeed 的一个新的开源 Python 库，旨在使模型不仅低延迟和低成本推理，而且还易于访问。
+
+    MII 提供了对数千种广泛使用的深度学习模型的高度优化实现。
+    与原始PyTorch实现相比，MII 支持的模型可显著降低延迟和成本。
+    为了实现低延迟/低成本推理，MII 利用 DeepSpeed-Inference 的一系列广泛优化，
+    例如：transformers 的深度融合、用于多 GPU 推理的自动张量切片、使用 ZeroQuant 进行动态量化等。
+    MII 只需几行代码即可通过 AML 在本地和 Azure 上低成本部署这些模型。
+
+
+FlexFlow Server
+    lexFlow Serve 是一个开源编译器和分布式系统，用于低延迟、高性能 LLM 服务。
+主要特征
+    投机（Speculative） 推理
+        使 FlexFlow Serve 能够加速 LLM 服务的一项关键技术是Speculative推理，
+        它结合了各种集体boost-tuned的小型投机模型 (SSM) 来共同预测 LLM 的输出；
+        预测被组织为token树，每个节点代表一个候选 token 序列。 
+        使用一种新颖的基于树的并行解码机制，根据 LLM 的输出并行验证由 token 树表示的所有候选 token 序列的正确性。
+        FlexFlow Serve 使用 LLM 作为 token 树验证器而不是增量解码器，这大大减少了服务生成 LLM 的端到端推理延迟和计算要求，
+        同时，可证明保持模型质量。
+    支持量化
+        FlexFlow Serve 支持 int4 和 int8 量化。 压缩后的张量存储在CPU端， 一旦复制到 GPU，这些张量就会进行解压缩并转换回其原始精度。
+与其他框架（vLLM、TGI、FasterTransformer）的性能对比
+    FlexFlow Serve 在单节点多 GPU 推理方面比现有系统高 1.3-2.0 倍，在多节点多 GPU 推理方面比现有系统高 1.4-2.4 倍。
+未来的规划
+FlexFlow Serve 正在积极开发中，主要专注于以下任务：
+    AMD 基准测试。目前正在积极致力于在 AMD GPU 上对 FlexFlow Serve 进行基准测试，并将其与 NVIDIA GPU 上的性能进行比较。
+    Chatbot prompt 模板和多轮对话
+    支持 FastAPI
+    与LangChain集成进行文档问答
+
+
+LMDeploy
+    LMDeploy 由 MMDeploy 和 MMRazor 团队联合开发，是涵盖了 LLM 任务的全套轻量化、部署和服务解决方案。 
+    这个强大的工具箱提供以下核心功能：
+        高效推理引擎 TurboMind：基于 FasterTransformer推理引擎，实现了高效推理引擎 TurboMind，
+            支持 InternLM、LLaMA、vicuna等模型在 NVIDIA GPU 上的推理。
+        交互推理方式：通过缓存多轮对话过程中 attention 的 k/v，记住对话历史，从而避免重复处理历史会话。
+        多 GPU 部署和量化：提供了全面的模型部署和量化（支持使用AWQ算法对模型权重进行 INT4 量化，
+            支持 KV Cache INT8 量化）支持，已在不同规模上完成验证。
+        persistent batch 推理：进一步优化模型执行效率。
+        支持张量并行推理（注意：量化部署时不支持进行张量并行）
+    支持的模型
+        LMDeploy 支持 TurboMind 和 Pytorch 两种推理后端。
