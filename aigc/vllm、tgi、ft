@@ -56,4 +56,16 @@ TGI
 
 
 FasterTransformer
-    FasterTransformer 通常和 Triton 搭配使用，首先需要安装 Triton Inference Server 
+    是一个用于实现基于Transformer的神经网络推理的加速引擎。 它包含Transformer块的高度优化版本的实现，其中包含编码器和解码器部分。
+    使用此模块，您可以运行编码器-解码器架构模型（如：T5）、仅编码器架构模型（如：BERT）和仅解码器架构模型（如： GPT）的推理。
+
+    FT框架是用C++/CUDA编写的，依赖于高度优化的 cuBLAS、cuBLASLt 和 cuSPARSELt 库，这使您可以在 GPU 上进行快速的 Transformer 推理。
+
+    与NVIDIA TensorRT等其他编译器相比，FT 的最大特点是它支持以分布式方式进行 Transformer 大模型推理。
+
+    下图显示了如何使用张量并行 (TP) 和流水线并行 (PP) 技术将基于Transformer架构的神经网络拆分到多个 GPU 和节点上。
+
+    当每个张量被分成多个块时，就会发生张量并行，并且张量的每个块都可以放置在单独的 GPU 上。
+    在计算过程中，每个块在不同的 GPU 上单独并行处理；
+    最后，可以通过组合来自多个 GPU 的结果来计算最终张量。
+    当模型被深度拆分，并将不同的完整层放置到不同的 GPU/节点上时，就会发生流水线并行。
