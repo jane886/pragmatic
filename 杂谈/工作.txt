@@ -46,6 +46,9 @@ FastChat Serving with Web GUI 启动方式
         支持自定义负载均衡规则
         兼容多模型格式
         兼容多模型Graph部署
+    未来
+    seldon-core-microservice本身对于模型load和infer/predict的工作，支持完全交给用户自定义。
+    是否可以在FastChat/其他推理框架上优化推理框架本身，结合seldon core推理服务。
 
 
 3，当我们进行 AI 推理的时候，往往需要经历这么两个步骤
