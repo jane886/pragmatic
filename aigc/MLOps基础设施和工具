@@ -1,0 +1,20 @@
+MLOps基础设施和工具
+MLOps（机器学习运维）是一种方法，旨在加速机器学习应用程序的开发、部署和维护。为了实现这一目标，MLOps使用了许多基础设施和工具。
+
+数据管道管理：用于整理、清洗和转换数据的工具，如 Apache NiFi, Luigi 和 Apache Airflow。
+
+版本控制：用于跟踪代码、数据和模型变化的工具，如 Git, DVC (Data Version Control) 和 MLflow。
+
+模型训练：用于在多种硬件环境下训练模型的工具和平台，如 TensorFlow, PyTorch, Keras 和 Apache MXNet。
+
+模型验证和测试：用于评估模型性能和准确性的工具，如 TensorFlow Extended (TFX) 和 MLflow。
+
+模型部署：用于将模型部署到生产环境的工具和平台，如 TensorFlow Serving, NVIDIA Triton Inference Server, AWS SageMaker 和 Microsoft Azure Machine Learning。
+
+模型监控：用于实时跟踪模型性能和健康状况的工具，如 Grafana, Prometheus 和 ELK Stack (Elasticsearch, Logstash, Kibana)。
+
+自动化和持续集成/持续部署（CI/CD）：用于自动化机器学习工作流程的工具，如 Jenkins, GitLab CI/CD 和 GitHub Actions。
+
+容器化和编排：用于简化部署和管理的容器技术，如 Docker 和 Kubernetes。
+
+云服务提供商：提供各种机器学习服务和基础设施的云平台，如 Amazon Web Services (AWS), Microsoft Azure 和 Google Cloud Platform (GCP)。
