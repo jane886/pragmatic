@@ -1,0 +1,26 @@
+sqlalchemy如果想设置一下数据库的连接池的大小，应该怎么设置，因为我们起一个项目的时候我们去和数据库做连接，连接数量是有上限的，
+上限就体现在这个连接池的大小上，这个大小应该怎么设置
+
+
+在SQLAlchemy中，可以使用create_engine()函数来创建数据库连接，并设置连接池的大小。连接池控制着数据库连接的数量，以便有效地管理连接资源并避免过多的连接。
+
+以下是设置连接池大小的方法：
+
+使用create_engine()函数的pool_size参数：
+python
+复制
+from sqlalchemy import create_engine
+
+engine = create_engine('mysql://username:password@host/database', pool_size=10)
+在上述示例中，pool_size参数设置连接池的大小为10，即最大同时打开的连接数为10。您可以根据您的项目需求和数据库的负载情况来调整此值。
+使用create_engine()函数的poolclass参数：
+python
+复制
+from sqlalchemy import create_engine
+from sqlalchemy.pool import QueuePool
+
+engine = create_engine('mysql://username:password@host/database', poolclass=QueuePool, pool_size=10)
+在上述示例中，poolclass参数指定了使用的连接池类别（QueuePool），并通过pool_size参数设置连接池的大小。
+需要注意的是，连接池的大小设置应该根据您的应用程序的具体需求和数据库的性能来进行调整。设置过小的连接池大小可能导致连接等待的增加，而设置过大可能会占用过多的资源。建议通过测试和性能监控来确定适合您应用程序的连接池大小。
+
+此外，还可以通过其他参数来设置连接池的行为，例如max_overflow参数用于控制在连接池已满的情况下，允许临时创建的额外连接的数量。您可以参考SQLAlchemy的文档以了解更多关于连接池的配置选项和详细说明。

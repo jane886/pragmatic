@@ -1,0 +1,23 @@
+在Dockerfile中，RUN命令、ENTRYPOINT命令和CMD命令是用于执行命令和设置容器默认执行命令的指令，它们具有不同的作用和用法：
+
+RUN命令：
+RUN命令的语法：RUN <command>
+RUN命令用于在构建镜像时执行命令，并生成新的镜像层。
+在Dockerfile中，每个RUN命令都会在新的临时容器中执行指定的命令，并在执行结束后将容器的状态提交为新的镜像层。
+RUN命令通常用于安装软件包、设置环境变量、运行脚本等构建镜像所需的操作。
+ENTRYPOINT命令：
+ENTRYPOINT命令的语法：ENTRYPOINT ["executable", "param1", "param2"] 或者 ENTRYPOINT command param1 param2
+ENTRYPOINT命令用于配置容器启动时要执行的命令，并将其作为容器的入口点。
+ENTRYPOINT命令的参数可以使用JSON数组形式或者普通命令形式。
+在运行容器时，可以覆盖ENTRYPOINT命令指定的默认命令，但仍然可以通过附加参数的方式传递参数给ENTRYPOINT命令。
+CMD命令：
+CMD命令的语法：CMD ["executable","param1","param2"] 或者 CMD command param1 param2
+CMD命令用于设置容器默认执行的命令和参数。
+CMD命令在Dockerfile中只能出现一次，如果有多个CMD命令，则只有最后一个CMD命令会生效。
+在运行容器时，如果没有指定要运行的命令，那么将执行CMD命令指定的默认命令。
+总结：
+
+RUN命令用于在构建镜像时执行命令，生成新的镜像层。
+ENTRYPOINT命令用于配置容器启动时要执行的命令，并将其作为容器的入口点。
+CMD命令用于设置容器默认执行的命令和参数。
+通常情况下，RUN命令用于构建镜像时的操作，而ENTRYPOINT和CMD命令则用于定义容器的启动行为。ENTRYPOINT定义了容器的入口点，而CMD定义了容器的默认执行命令。在实际使用中，可以根据需求选择适合的指令来构建和配置容器。

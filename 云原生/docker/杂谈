@@ -1,0 +1,46 @@
+在写dockerfile的时候可能会给不同的服务起一些名字，会在services上面可能是数据库起名叫db、服务起名叫app，
+然后每个容器都会有自己的名字，然后我们会用configname来设计这个容器叫什么名字，
+在桥网的环境下，在一个容器里边访问另一个容器的服务，我是应该用服务名，还是用容器名能访问到另一个容器的接口，
+还是用网关名还是 127、localhost
+
+在Docker中，当使用桥接网络（Bridge Network）时，可以使用服务名或容器名来访问另一个容器的服务。
+这是因为Docker会为每个容器分配一个唯一的DNS名称，并且在同一桥接网络中的容器可以相互解析这些名称。
+
+当您在Docker Compose或Docker Swarm等工具中定义服务时，可以为每个服务指定一个名称，比如将数据库服务命名为"db"，将应用程序服务命名为"app"。
+在同一桥接网络中，这些服务名称将作为DNS名称解析为相应的容器IP地址。
+
+因此，在一个容器中访问另一个容器的服务时，可以使用服务名称作为主机名或域名进行访问。
+例如，在应用容器中访问数据库容器的服务，可以使用"db"作为主机名。
+
+示例（使用服务名进行访问）：
+
+dockerfile
+# 在应用容器中访问数据库服务
+FROM ubuntu:latest
+RUN apt-get update && apt-get install -y curl
+CMD curl http://db:8080/api
+
+另外，您也可以使用容器名称来进行访问。Docker会自动在桥接网络中为每个容器分配一个唯一的主机名，
+该主机名与容器名称相同。因此，您可以使用容器名称作为主机名进行访问。
+
+示例（使用容器名进行访问）：
+dockerfile
+# 在应用容器中访问数据库容器
+FROM ubuntu:latest
+RUN apt-get update && apt-get install -y curl
+CMD curl http://container_name:8080/api
+
+另外，如果您希望在主机上访问容器的服务，可以使用容器的IP地址、桥接网络的网关地址或者主机名"localhost"。
+需要注意的是，如果使用主机网络（Host Network），则可以直接使用"localhost"进行访问。
+
+示例（使用主机网络）：
+dockerfile
+# 在主机上访问容器服务
+FROM ubuntu:latest
+RUN apt-get update && apt-get install -y curl
+CMD curl http://localhost:8080/api
+
+总结：
+在桥接网络中，可以使用服务名或容器名来访问另一个容器的服务。
+如果使用主机网络，可以使用容器的IP地址、桥接网络的网关地址或者主机名"localhost"来访问容器的服务。
+根据您的具体情况和需求，选择适合的方式进行容器间的通信。
