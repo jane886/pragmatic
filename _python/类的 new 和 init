@@ -1,0 +1,85 @@
+在 Python 中，`__new__` 和 `__init__` 是两个特殊的方法，分别用于对象的创建和初始化。它们在类的实例化过程中扮演着不同的角色。
+
+### `__new__` 方法
+
+- **定义**：`__new__(cls, *args, **kwargs)` 是一个类方法（通常是静态方法），用于创建并返回一个新的实例。它是实例化过程中的第一个步骤。
+- **作用**：分配内存并返回类的实例。通常，`__new__` 方法会调用父类的 `__new__` 方法来实际创建实例。
+- **调用顺序**：在实例创建时，`__new__` 方法先于 `__init__` 方法被调用。
+- **返回值**：必须返回一个实例对象，否则实例化会失败。
+
+```python
+class MyClass:
+    def __new__(cls, *args, **kwargs):
+        print("Creating instance")
+        instance = super(MyClass, cls).__new__(cls)
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        print("Initializing instance")
+```
+
+### `__init__` 方法
+
+- **定义**：`__init__(self, *args, **kwargs)` 是一个实例方法，用于初始化已经创建好的实例。
+- **作用**：设置实例的初始属性或执行其他初始化动作。它在实例创建之后立即被调用。
+- **调用顺序**：在实例创建之后，`__init__` 方法被调用。
+- **返回值**：它没有返回值，默认返回 `None`。如果在 `__init__` 方法中使用 `return`，会引发 `TypeError`。
+
+```python
+class MyClass:
+    def __new__(cls, *args, **kwargs):
+        print("Creating instance")
+        instance = super(MyClass, cls).__new__(cls)
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        print("Initializing instance")
+```
+
+### 调用顺序
+
+1. **`__new__` 方法**：首先被调用，用于创建实例。
+2. **`__init__` 方法**：其次被调用，用于初始化实例。
+
+### `__init__` 方法的返回值
+
+`__init__` 方法没有返回值，默认返回 `None`。如果在 `__init__` 方法中使用 `return` 语句并返回一个值（例如 `return 1`），会引发 `TypeError`，因为 `__init__` 方法不应该返回任何值。
+
+```python
+class MyClass:
+    def __init__(self, *args, **kwargs):
+        print("Initializing instance")
+        return 1  # This will cause a TypeError
+
+try:
+    obj = MyClass()
+except TypeError as e:
+    print(e)  # Output: __init__() should return None, not 'int'
+```
+
+### 示例代码
+
+下面是一个完整的示例，展示了 `__new__` 和 `__init__` 的调用顺序，并说明 `__init__` 方法中返回值的问题：
+
+```python
+class MyClass:
+    def __new__(cls, *args, **kwargs):
+        print("Creating instance")
+        instance = super(MyClass, cls).__new__(cls)
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        print("Initializing instance")
+        # return 1  # Uncommenting this will cause a TypeError
+
+obj = MyClass()
+```
+
+输出结果会是：
+
+```
+Creating instance
+Initializing instance
+```
+
+综上所述，`__new__` 方法用于创建实例并返回一个实例对象，而 `__init__` 方法用于初始化实例且不应返回任何值。实例化过程中，`__new__` 方法先被调用，然后是 `__init__` 方法。
