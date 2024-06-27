@@ -35,30 +35,36 @@ FastChat Serving with Web GUI 启动方式
 
 
 2，引擎平台
-    引擎平台主要是要把这些训练好的大模型通过 k8s 来实现自动部署
-    训练好的大模型会存储在统一的模型池子里，当新创建一个大模型推理服务时，
-    
-    优点：
-        原生基于k8s，支持多模型框架，支持灰度/金丝雀等发布方案
-        seldon core基于k8s，无需任何改造；
-        支持DAG推理图；
-        代码的侵入性非常低。用户只需要提供对应的 HTTP/gRPC Endpoint 来提供服务就可以，而不需要引用 Seldon Core 的 SDK；
-    缺点：
-        mlflow推理框架基于seldon core提供的基础镜像，没有任何针对大模型优化；
-        无需推理图情况，也会有engine网络损耗；
-        不直接支持离线部署；
-    目标
-        支持nlp/cv 方向 小模型/大模型
-        支持单模型一键部署，提供Http/RPC服务
-        支持离线SDK
-        支持离线镜像
-        支持扩缩容
-        支持自定义负载均衡规则
-        兼容多模型格式
-        兼容多模型Graph部署
-    未来
-    seldon-core-microservice本身对于模型load和infer/predict的工作，支持完全交给用户自定义。
-    是否可以在FastChat/其他推理框架上优化推理框架本身，结合seldon core推理服务。
+    引擎平台主要有模型服务、模型精调、提示工程等等这些模块，我主要是负责模型服务，把微调、预训练好的或者基线模型创建自动部署服务
+    前期我们已经成功支持自动部署 onnx 模型，因为当时接下来我们在调研 transformer 这类模型，也作了很多调研和实验工作
+    当创建部署服务时，流水线一开始会调用 model convert 模块，把模型转换成统一格式，也就是 mlflow Model 格式，
+    然后就是部署模块，在部署引擎上面我们选择的是 seldon，它原生基于k8s，提供了一套相对统一的部署方式，支持不同机器学习框架(TensorFlow、PyTorch等)训练的模型，
+    还支持DAG复杂推理图。
+
+    MLFLOW_SERVER
+    SKLEARN_SERVER
+    TEMPO_SERVER
+    TENSORFLOW_SERVER
+    TRITON_SERVER
+    XGBOOST_SERVER
+    虽然 seldon core 里面已经预置打包了很多推理服务器，我们选用的 mlserver 这个推理服务器，因为它支持 mlflow Model 格式
+    但是当时在 transformer 这类模型的支持上还不是很完善，在部署流程上我们做了很多封装和源码修改
+    比如在 Model 创建层面，它并不支持非原生类的模型，比如 chatglm，发现它的源码库里暂时还支持非原生 Model 类加载方式，
+    但我们发现这类模型它本身的模型文件里就自带了类加载方式，于是我们就在这里做了一层适配，如果判别是非原生支持的模型，就自动从模型自带的方式加载
+
+    接下来是推理层面，当模型服务部署起来后，发现在请求推理的时候一直在报错，通过日志我们观察到它在 conversation 任务类型的 Pipeline 推理结果在 encode_response 时报错，
+    但是翻译类任务的推理就没有问题，在深入源码里面找到 model perdict 的位置，发现 conversation 任务类的模型推理出来的结果文本类型，并不在 encode 的转换类型范围内，
+    所以我们在这里也做一个适配
+
+    修复推理结果奇怪的问题
+    方案：1，调整超参
+        2，调整 input_ids 的生成方式。
+    利用 FastChat 打包好的 Python 第三方库 fschat 提供的不同模型 Conversation 定义好的 Prompt 结合输入问题来拼接对话上下文进行 input_ids 生成
+
+    加入 vllm
+ 
+
+
 
 
 3，当我们进行 AI 推理的时候，往往需要经历这么两个步骤

@@ -1,3 +1,26 @@
+优点：
+    原生基于k8s，支持多模型框架，支持灰度/金丝雀等发布方案
+    seldon core基于k8s，无需任何改造；
+    支持DAG推理图；
+    代码的侵入性非常低。用户只需要提供对应的 HTTP/gRPC Endpoint 来提供服务就可以，而不需要引用 Seldon Core 的 SDK；
+缺点：
+    mlflow推理框架基于seldon core提供的基础镜像，没有任何针对大模型优化；
+    无需推理图情况，也会有engine网络损耗；
+    不直接支持离线部署；
+目标
+    支持nlp/cv 方向 小模型/大模型
+    支持单模型一键部署，提供Http/RPC服务
+    支持离线SDK
+    支持离线镜像
+    支持扩缩容
+    支持自定义负载均衡规则
+    兼容多模型格式
+    兼容多模型Graph部署
+未来
+seldon-core-microservice本身对于模型load和infer/predict的工作，支持完全交给用户自定义。
+是否可以在FastChat/其他推理框架上优化推理框架本身，结合seldon core推理服务。
+
+
 根据提供的资料,使用Seldon部署大模型的主要优缺点如下:
     优点:
     统一的部署方式:
@@ -73,16 +96,7 @@ Seldon Core：速度极快、行业就绪的机器学习
 
     mnist-model 容器：从其使用的 image 可知，这是一个 proxy 服务，主要实现协议转换，即 seldon 协议请求，转换成 tensorflow 协议请求
 
-    engine 容器：主要用于支持 sdep 资源的 graph 功能，即可以将多个模型服务分别进行打分及组合。将在后续文章继续展开介绍四个 container 的作用和关系，分别如下：
-
-    init 容器：根据 sdep 的参数 modelUri，从 gs 获取模型文件，并保存到/mnt/models
-
-    tfserving 容器：从/mnt/models 加载模型，并通过 2000/2001 端口提供服务
-
-    mnist-model 容器：从其使用的 image 可知，这是一个 proxy 服务，主要实现协议转换，即 seldon 协议请求，转换成 tensorflow 协议请求
-
-    engine 容器：主要用于支持 sdep 资源的 graph 功能，即可以将多个模型服务分别进行打分及组合。将在后续文章继续展开介绍
-
+    engine 容器：主要用于支持 sdep 资源的 graph 功能，即可以将多个模型服务分别进行打分及组合。
 
 9，seldon 的 manager 服务，即 seldon-controller-manager，这是一个 k8s 的 Operator 服务，
     负责管理所有 SeldonDeployment（简称 sdep）资源的生命周期，包括创建，修改及删除。
