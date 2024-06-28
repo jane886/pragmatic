@@ -1,0 +1,13 @@
+在 Kubernetes (K8s) 中，可以使用一些工具和策略来实现熔断和限流。以下是一些常用的方法：
+
+1. **Kubernetes HPA（Horizontal Pod Autoscaler）**：Kubernetes HPA 可以根据应用程序的负载自动调整 Pod 的副本数量。通过设置合适的 CPU 和内存阈值，HPA 可以根据负载情况自动扩展或收缩 Pod 的数量，以满足应用程序的需求。这样可以避免系统过载，并确保资源的有效利用。
+
+2. **Kubernetes Ingress Controller**：Kubernetes Ingress Controller 可以用于限制进入集群的请求速率。通过配置 Ingress Controller，可以设置每秒或每分钟允许的请求数量，以及拒绝超过限制的请求。这有助于控制请求的流量，并保护后端服务免受过多的请求压力。
+
+3. **Kubernetes Network Policies**：Kubernetes Network Policies 可以帮助限制 Pod 之间的网络流量。通过定义网络策略，可以指定允许或禁止的流量规则，包括源 IP、目标 IP、协议、端口等。通过配置适当的网络策略，可以限制流量并确保资源的合理使用。
+
+4. **Kubernetes Resource Quotas**：Kubernetes Resource Quotas 允许你为命名空间设置资源配额。通过设置资源配额，可以限制命名空间中的 CPU、内存和存储资源的使用量。这有助于控制资源的消耗，并避免一个命名空间占用过多的资源导致其他应用受限。
+
+5. **Kubernetes Custom Metrics**：Kubernetes 提供了自定义指标的支持，可以根据应用程序的需求定义和使用自定义指标。通过监控自定义指标，可以实现基于更细粒度的度量进行熔断和限流的逻辑。例如，根据请求的成功率、错误率或其他业务指标来触发熔断或限制流量。
+
+这些方法可以根据具体的需求和场景进行组合和调整。Kubernetes 提供了丰富的功能和工具，可以帮助实现熔断和限流的策略，确保应用程序在高负载下的稳定性和可用性。
