@@ -1,0 +1,77 @@
+在Python中,可以使用以下方法查看一个类的 `__init__` 方法的参数:
+
+1. 使用 `inspect` 模块的 `signature` 函数:
+
+```python
+import inspect
+
+class MyClass:
+    def __init__(self, arg1, arg2, arg3=None):
+        pass
+
+sig = inspect.signature(MyClass.__init__)
+print(sig.parameters)
+```
+
+输出:
+```
+OrderedDict([('arg1', <Parameter "arg1">), ('arg2', <Parameter "arg2">), ('arg3', <Parameter "arg3=None">)])
+```
+
+2. 使用 `__annotations__` 属性(Python 3.5+):
+
+```python
+class MyClass:
+    def __init__(self, arg1: str, arg2: int, arg3: float = 0.0):
+        pass
+
+print(MyClass.__init__.__annotations__)
+```
+
+输出:
+```
+{'arg1': <class 'str'>, 'arg2': <class 'int'>, 'arg3': <class 'float'>, 'return': None}
+```
+
+3. 使用 `__code__` 属性获取字节码对象,然后访问 `co_varnames` 属性:
+
+```python
+class MyClass:
+    def __init__(self, arg1, arg2, arg3=None):
+        pass
+
+print(MyClass.__init__.__code__.co_varnames)
+```
+
+输出:
+```
+('self', 'arg1', 'arg2', 'arg3')
+```
+
+4. 使用 `pydoc` 模块的 `help` 函数:
+
+```python
+import pydoc
+
+class MyClass:
+    def __init__(self, arg1, arg2, arg3=None):
+        pass
+
+pydoc.help(MyClass.__init__)
+```
+
+输出:
+```
+Help on function __init__ in module __main__:
+
+__init__(self, arg1, arg2, arg3=None)
+```
+
+这些方法可以帮助你在运行时查看一个类的 `__init__` 方法的参数列表。选择合适的方法取决于你的具体需求和Python版本。
+
+Citations:
+[1] https://docs.pingcode.com/ask/99593.html
+[2] https://ithelp.ithome.com.tw/articles/10230592
+[3] https://blog.csdn.net/tz_zs/article/details/119363470
+[4] https://apifox.com/apiskills/how-to-use-websocket-in-python/
+[5] https://www.yiibai.com/websocket/python-websockets-library.html
