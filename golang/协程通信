@@ -1,0 +1,62 @@
+在Go语言中，协程（goroutine）是一种轻量级的线程，可以并发执行。
+协程之间的通信是通过共享的内存来实现的，而在协程之间共享内存的关键是使用通道（channel）。
+
+通道是一种特殊的类型，它提供了协程之间安全传递数据的机制。
+通道可以用于发送和接收值，协程可以通过通道发送数据到其他协程，或从通道接收其他协程发送的数据。
+
+以下是通过通道进行协程间通信的基本步骤：
+
+1. 创建通道：使用内置的`make`函数创建一个通道。通道的类型是需要传递的数据类型。例如，要创建一个整数类型的通道，可以使用`make(chan int)`。
+
+2. 发送数据：使用通道的发送操作符`<-`将数据发送到通道中。例如，发送整数值到通道可以使用`channel <- value`的形式。
+
+3. 接收数据：使用通道的接收操作符`<-`从通道中接收数据。例如，从通道接收整数值可以使用`value := <- channel`的形式。
+
+4. 阻塞和同步：通道的发送和接收操作是阻塞的，当发送操作没有接收者或通道已满时，发送操作会阻塞。
+    当接收操作没有发送者或通道为空时，接收操作会阻塞。这种阻塞特性可以用于实现协程之间的同步。
+
+以下是一个简单的示例，演示了两个协程通过通道进行通信：
+
+```go
+package main
+
+import "fmt"
+
+func worker(id int, jobs <-chan int, results chan<- int) {
+	for job := range jobs {
+		fmt.Println("Worker", id, "processing job", job)
+		results <- job * 2
+	}
+}
+
+func main() {
+	numJobs := 5
+	jobs := make(chan int, numJobs)
+	results := make(chan int, numJobs)
+
+	// 启动三个协程
+	for i := 1; i <= 3; i++ {
+		go worker(i, jobs, results)
+	}
+
+	// 发送任务到通道
+	for i := 1; i <= numJobs; i++ {
+		jobs <- i
+	}
+
+	// 关闭通道，表示没有更多的任务
+	close(jobs)
+
+	// 从结果通道接收并打印结果
+	for i := 1; i <= numJobs; i++ {
+		result := <-results
+		fmt.Println("Received result:", result)
+	}
+}
+```
+
+在上述示例中，我们创建了两个通道，`jobs`通道用于发送任务，`results`通道用于接收结果。
+然后，我们启动了三个协程来处理任务，它们从`jobs`通道接收任务，处理后将结果发送到`results`通道。
+主协程通过循环将任务发送到`jobs`通道，然后通过循环从`results`通道接收结果并打印。
+
+通过这种方式，协程之间通过共享的通道进行数据的传递和同步，实现了高效的协程间通信。通道的使用可以保证数据的安全传递，避免了竞态条件和其他并发问题。
